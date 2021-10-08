@@ -9,4 +9,4 @@ while True:
             pygame.quit()
             sys.exit()
 
-    screen.update()
+    pygame.display.update()
