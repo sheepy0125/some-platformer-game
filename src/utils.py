@@ -4,7 +4,16 @@ Created by sheepy0125
 02/10/2021
 """
 
+from pathlib import Path
 
+###############
+### Globals ###
+###############
+ROOT_PATH: Path = Path(__file__).parent.parent
+
+####################
+### Logger class ###
+####################
 class Logger:
     """Log messages with ease"""
 

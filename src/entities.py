@@ -7,6 +7,7 @@ Created by duuuck and sheepy0125
 import pygame
 from pygame_setup import *
 from config_parser import *
+from utils import Logger, ROOT_PATH
 
 ##############
 ### Entity ###
@@ -30,7 +31,6 @@ class Entity:
         self.rect = self.surface.get_rect(center=self.pos)
 
     def move(self, new_pos: tuple):
-        Logger.log(f"Moving to {new_pos}")
         self.rect.centerx, self.rect.centery = new_pos
         self.pos = new_pos
 
@@ -48,7 +48,7 @@ class Player(Entity):
     def __init__(self):
         super().__init__(
             size=(50, 100),
-            image_path=f"assets/images/player.png",
+            image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
 

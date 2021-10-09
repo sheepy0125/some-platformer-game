@@ -10,6 +10,7 @@ Created by duuuck and sheepy0125
 # Import
 from pygame_setup import *
 from entities import *
+from utils import Logger, ROOT_PATH
 from sys import exit
 
 # Create entities
