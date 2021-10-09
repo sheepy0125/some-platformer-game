@@ -16,7 +16,7 @@ from sys import exit
 player = Player()
 entities: list[Entity] = []
 
-while False == False:
+while True:
     # Event handling
     for event in pygame.event.get():
         # Exit
