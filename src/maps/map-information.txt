@@ -1,0 +1,6 @@
+good version coming soon
+
+1 = dirt
+0 = sky
+
+60x10 dimensions

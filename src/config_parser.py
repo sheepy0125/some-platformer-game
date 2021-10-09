@@ -6,7 +6,6 @@ Created by sheepy0125
 
 from json import load
 from utils import Logger, ROOT_PATH
-from pathlib import Path
 
 try:
     CONFIG_FILE_PATH = str(ROOT_PATH / "config.json")

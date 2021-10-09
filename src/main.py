@@ -11,11 +11,15 @@ Created by duuuck and sheepy0125
 from pygame_setup import *
 from entities import *
 from utils import Logger, ROOT_PATH
+from world import *
 from sys import exit
 
 # Create entities
 player = Player()
 entities: list[Entity] = []
+
+# Create world
+world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
 
 while True:
     # Event handling
@@ -31,6 +35,7 @@ while True:
 
     # Draw
     screen.fill("blue")
+    world.draw_tiles()
     player.draw()
     pygame.display.update()
     clock.tick(FPS)
