@@ -1,7 +1,7 @@
 """
 Word class & data for Some Platformer Game
 Created by sheepy0125
-Source: https://youtu.be/abH2MSBdnW
+Source: https://youtu.be/abH2MSBdnWc
 09/10/2021
 """
 

@@ -32,12 +32,14 @@ while True:
             exit(0)
 
     player.movement_handler()
+    player.move()
 
     # Draw
     screen.fill("blue")
     world.draw_tiles()
     player.draw()
     pygame.display.update()
+
     clock.tick(FPS)
 
 Logger.warn("You're not supposed to see this (exited out of main loop)")

@@ -14,6 +14,7 @@ try:
 
     SCREEN_SIZE = tuple(config_dict["screenSize"])
     FPS = int(config_dict["fps"])
+    GRAVITY_MULTIPLIER = float(config_dict["gravityMultiplier"])
 
 except Exception as error:
     Logger.log_error(error)

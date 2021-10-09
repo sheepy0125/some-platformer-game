@@ -19,7 +19,10 @@ class Entity:
         self.size = size
         self.image_path = image_path
         self.pos = list(default_pos)
-        self.vy = 0
+        self.velocity = [0, 0]
+        self.velocity_cap = (20, 10)
+        self.movement_multiplier = 0
+
         self.create()
 
     def __str__(self):
@@ -30,9 +33,26 @@ class Entity:
         self.surface = pygame.transform.scale(self.surface, self.size)
         self.rect = self.surface.get_rect(center=self.pos)
 
-    def move(self, new_pos: tuple):
+    def move(self):
+        # Add velocity
+        self.velocity[0] += 5 * self.movement_multiplier
+        if abs(self.velocity[0] > self.velocity_cap[0]):
+            self.velocity[0] = self.velocity_cap[0]
+
+        # Terminal velocity
+        if abs(self.velocity[0]) > self.velocity_cap[0]:
+            self.velocity[0] = self.velocity_cap[0] * self.movement_multiplier
+
+        if self.movement_multiplier == 0:
+            self.velocity[0] = 0
+
+        new_pos = [self.rect.centerx + self.velocity[0], self.pos[1]]
+
+        self.set_pos(new_pos)
+
+    def set_pos(self, new_pos: tuple):
         self.rect.centerx, self.rect.centery = new_pos
-        self.pos = new_pos
+        self.pos = list(new_pos)
 
     def get_collisions(self, rects) -> list:
         return [other_rect for other_rect in rects if self.rect.colliderect(other_rect)]
@@ -55,19 +75,27 @@ class Player(Entity):
         Logger.log("Created player")
 
     def movement_handler(self):
-        MOVE_BY = 10
-        GRAVITY = 1
         keys: dict = pygame.key.get_pressed()
-        self.vy += GRAVITY
-        self.pos[1] += self.vy
+
+        self.jump_gravity_handler(jump_pressed=keys[pygame.K_UP])
 
         # Right
         if keys[pygame.K_RIGHT]:
-            self.pos[0] += MOVE_BY
+            self.movement_multiplier = 1
+
         # Left
-        if keys[pygame.K_LEFT]:
-            self.pos[0] -= MOVE_BY
+        elif keys[pygame.K_LEFT]:
+            self.movement_multiplier = -1
 
+        # None
+        else:
+            self.movement_multiplier = 0
 
+    def jump_gravity_handler(self, jump_pressed: bool):
+        # Gravity! (falling)
+        self.velocity[1] += GRAVITY_MULTIPLIER
 
-        self.move(self.pos)
+        if jump_pressed:
+            self.velocity[1] = -5 * (GRAVITY_MULTIPLIER * 2)
+
+        self.pos[1] += self.velocity[1]
