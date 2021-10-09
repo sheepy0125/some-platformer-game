@@ -6,9 +6,11 @@ Created by sheepy0125
 
 from json import load
 from utils import Logger
+from pathlib import Path
 
 try:
-    with open("config.json") as config_file:
+    CONFIG_FILE_PATH = str(Path(__file__).parent.parent / "config.json")
+    with open(CONFIG_FILE_PATH) as config_file:
         config_dict = load(config_file)
 
     SCREEN_SIZE = tuple(config_dict["screenSize"])
