@@ -16,11 +16,13 @@ from sys import exit
 player = Player()
 entities: list[Entity] = []
 
-while True:
+while False == False:
     # Event handling
     for event in pygame.event.get():
         # Exit
         if event.type == pygame.QUIT:
+            running = False
+            Logger.log("Shutting down gracefully")
             pygame.quit()
             exit(0)
 
@@ -28,3 +30,5 @@ while True:
     screen.fill("blue")
     player.draw()
     pygame.display.update()
+
+Logger.warn("You're not supposed to see this (exited out of main loop)")

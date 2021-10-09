@@ -49,3 +49,5 @@ class Player(Entity):
             image_path=f"assets/images/player.png",
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
+
+        Logger.log("Created player")
