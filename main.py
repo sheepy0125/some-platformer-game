@@ -1,12 +1,30 @@
-import pygame,sys
+"""
+Some Platformer Game
+Created by duuuck and sheepy0125
+08/10/2021
+"""
 
-screen = pygame.display.set_mode((500,500))
+#############
+### Setup ###
+#############
+# Import
+from pygame_setup import *
+from entities import *
+from sys import exit
+
+# Create entities
+player = Player()
+entities: list[Entity] = []
 
 while True:
+    # Event handling
     for event in pygame.event.get():
+        # Exit
         if event.type == pygame.QUIT:
-            #exit the game
             pygame.quit()
-            sys.exit()
+            exit(0)
 
+    # Draw
+    screen.fill("blue")
+    player.draw()
     pygame.display.update()
