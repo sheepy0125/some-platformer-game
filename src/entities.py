@@ -19,7 +19,7 @@ class Entity:
         self.size = size
         self.image_path = image_path
         self.pos = list(default_pos)
-
+        self.vy = 0
         self.create()
 
     def __str__(self):
@@ -34,8 +34,8 @@ class Entity:
         self.rect.centerx, self.rect.centery = new_pos
         self.pos = new_pos
 
-    def check_collision(self, other_rect) -> bool:
-        return self.rect.colliderect(other_rect)
+    def get_collisions(self, rects) -> list:
+        return [other_rect for other_rect in rects if self.rect.colliderect(other_rect)]
 
     def draw(self):
         screen.blit(self.surface, (self.rect.left, self.rect.top))
@@ -56,16 +56,18 @@ class Player(Entity):
 
     def movement_handler(self):
         MOVE_BY = 10
+        GRAVITY = 1
         keys: dict = pygame.key.get_pressed()
+        self.vy += GRAVITY
+        self.pos[1] += self.vy
 
         # Right
         if keys[pygame.K_RIGHT]:
             self.pos[0] += MOVE_BY
         # Left
-        elif keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT]:
             self.pos[0] -= MOVE_BY
 
-        else:
-            return
+
 
         self.move(self.pos)
