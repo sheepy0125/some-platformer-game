@@ -37,8 +37,8 @@ class Entity:
     def check_collision(self, other_rect) -> bool:
         return self.rect.colliderect(other_rect)
 
-    def draw(self):
-        screen.blit(self.surface, (self.rect.left, self.rect.top))
+    def draw(self,x_offset):
+        screen.blit(self.surface, (self.rect.left + x_offset, self.rect.top))
 
 
 ##############
@@ -51,10 +51,12 @@ class Player(Entity):
             image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
+        self.vy = 0
 
         Logger.log("Created player")
 
-    def movement_handler(self):
+    def movement_handler(self): 
+        #TODO: ADD COLLISIONS
         MOVE_BY = 10
         keys: dict = pygame.key.get_pressed()
 

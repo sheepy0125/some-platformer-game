@@ -17,7 +17,10 @@ from sys import exit
 player = Player()
 entities: list[Entity] = []
 
+x_offset = 0
+
 while True:
+    x_offset -= (player.rect.centerx - SCREEN_SIZE[0]/2 + x_offset)/10
     # Event handling
     for event in pygame.event.get():
         # Exit
@@ -26,12 +29,16 @@ while True:
             Logger.log("Shutting down gracefully")
             pygame.quit()
             exit(0)
+        if event.type == pygame.KEYDOWN:
+            if event.type == pygame.K_SPACE:
+                pass
+                # enter jump here
 
     player.movement_handler()
 
     # Draw
     screen.fill("blue")
-    player.draw()
+    player.draw(x_offset)
     pygame.display.update()
     clock.tick(FPS)
 
