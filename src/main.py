@@ -26,9 +26,12 @@ while True:
             pygame.quit()
             exit(0)
 
+    player.movement_handler()
+
     # Draw
     screen.fill("blue")
     player.draw()
     pygame.display.update()
+    clock.tick(FPS)
 
 Logger.warn("You're not supposed to see this (exited out of main loop)")

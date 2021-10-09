@@ -14,6 +14,7 @@ try:
         config_dict = load(config_file)
 
     SCREEN_SIZE = tuple(config_dict["screenSize"])
+    FPS = int(config_dict["fps"])
 
 except Exception as error:
     Logger.log_error(error)

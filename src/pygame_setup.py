@@ -9,3 +9,4 @@ from config_parser import *
 
 screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Some Platformer Game")
+clock = pygame.time.Clock()

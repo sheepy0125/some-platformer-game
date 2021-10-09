@@ -1,3 +1,4 @@
 {
-    "screenSize": [500, 500]
+    "screenSize": [500, 500],
+    "fps": 30
 }
