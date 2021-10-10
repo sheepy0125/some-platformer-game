@@ -68,6 +68,7 @@ class Tile:
 
     def __init__(self, pos: tuple, image_path: str):
         self.x, self.y = pos
+        self.scroll_x, self.scroll_y = (0, 0)
         self.image_path = image_path
 
         self.create()
@@ -81,7 +82,7 @@ class Tile:
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
     def draw(self):
-        screen.blit(self.surface, (self.x, self.y))
+        screen.blit(self.surface, (self.x + self.scroll_x, self.y + self.scroll_y))
 
 
 ####################

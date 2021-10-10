@@ -15,7 +15,9 @@ from world import Tile, load_world, TILE_SIZE
 from utils import Logger, ROOT_PATH
 
 # Setup
+pygame.display.set_caption("Map maker for Some Platformer Game")
 tiles = []
+scrolled_by = 0
 
 #################
 ### Functions ###
@@ -40,13 +42,19 @@ def destroy_tile(mouse_pos):
     # But, too bad!
     tile_pos = snap_to_grid(mouse_pos)
     for tile_idx, tile in enumerate(tiles):
-        if (tile.x, tile.y) == tuple(tile_pos):
+        if (tile.x + tile.scroll_x, tile.y) == tuple(tile_pos):
             # That's the one!
             Logger.log(f"Removed the tile at {tile_pos}")
             tiles.pop(tile_idx)
             return
 
     Logger.fatal(f"No tile found at {tile_pos}")
+
+
+def scroll_screen(multiplier: int):
+    for tile in tiles:
+        tile.scroll_x -= multiplier * TILE_SIZE
+    # Logger.log(f"Scrolled tiles by {multiplier}. New scrolled by is {scrolled_by}")
 
 
 def export():
@@ -75,6 +83,18 @@ while True:
             # Destroying
             else:
                 destroy_tile((mouse_x, mouse_y))
+
+        # Keypress
+        if event.type == pygame.KEYUP:
+            # Scroll screen to the right
+            if event.key == pygame.K_RIGHT:
+                scrolled_by += TILE_SIZE
+                scroll_screen(1)
+
+            # Scroll screen to the left
+            elif event.key == pygame.K_LEFT:
+                scrolled_by -= TILE_SIZE
+                scroll_screen(-1)
 
     # Draw
     screen.fill("blue")
