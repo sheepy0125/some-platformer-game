@@ -19,7 +19,7 @@ class Entity:
     def __init__(self, size: tuple, image_path: str, default_pos: list):
         self.size = size
         self.image_path = image_path
-        self.pos = list(default_pos)
+        self.default_pos = list(default_pos)
         self.vx = 0
         self.vy = 0
         self.velocity_cap = (20, 10)
@@ -38,9 +38,7 @@ class Entity:
     def create(self):
         self.surface = pygame.image.load(self.image_path).convert_alpha()
         self.surface = pygame.transform.scale(self.surface, self.size)
-        self.rect = self.surface.get_rect(center=self.pos)
-
-
+        self.rect = self.surface.get_rect(center=self.default_pos)
 
     def get_tile_collisions(self, tile_rects: list):
         return [
@@ -61,11 +59,9 @@ class Entity:
         if abs(self.vx > self.velocity_cap[0]):
             self.vx = self.velocity_cap[0]
 
-
-
         # Terminal velocity
         # if abs(self.vy) < self.velocity_cap[1]:
-            # self.vy = self.velocity_cap[1]
+        # self.vy = self.velocity_cap[1]
 
         # Set position
         self.rect.x += self.vx
@@ -136,7 +132,6 @@ class Player(Entity):
         self.air_time = 0
         self.air_time_grace_period = 5
 
-
         Logger.log("Created player")
 
     def event_handler(self):
@@ -157,7 +152,6 @@ class Player(Entity):
             ):
                 self.vy = -20
 
-
         # Right
         if keys[pygame.K_RIGHT]:
             self.vx = 10
@@ -174,5 +168,5 @@ class Player(Entity):
 
         # Reset
         if keys[pygame.K_r]:
-            self.velocity = [0, 0]
-            self.rect.center = default_pos
+            self.vx, self.vy = (0, 0)
+            self.rect.center = self.default_pos
