@@ -43,7 +43,7 @@ def destroy_tile(mouse_pos):
     # But, too bad!
     tile_pos = snap_to_grid(mouse_pos)
     for tile_idx, tile in enumerate(tiles):
-        if (tile.x + tile.scroll_x, tile.y) == tuple(tile_pos):
+        if (tile.x - tile.scroll_x, tile.y) == tuple(tile_pos):
             # That's the one!
             Logger.log(f"Removed the tile at {tile_pos}")
             tiles.pop(tile_idx)
@@ -54,7 +54,7 @@ def destroy_tile(mouse_pos):
 
 def scroll_screen(multiplier: int):
     for tile in tiles:
-        tile.scroll_x -= multiplier * TILE_SIZE
+        tile.scroll_x += multiplier * TILE_SIZE
     # Logger.log(f"Scrolled tiles by {multiplier}. New scrolled by is {scrolled_by}")
 
 

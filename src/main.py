@@ -11,7 +11,7 @@ Created by duuuck and sheepy0125
 from pygame_setup import *
 from entities import *
 from utils import Logger, ROOT_PATH
-from world import * 
+from world import *
 from sys import exit
 
 # Create entities
@@ -32,6 +32,11 @@ while True:
 
     player.event_handler()
     player.move(all_tiles=world)
+
+    # Scroll world
+    player.scroll_x += (player.rect.centerx - player.scroll_x - SCROLL_OFFSET) / 10
+    player.scroll_y += (player.rect.centery - player.scroll_y - 300) / 10
+    world.scroll_tiles((player.scroll_x, player.scroll_y))
 
     # Draw
     screen.fill("blue")

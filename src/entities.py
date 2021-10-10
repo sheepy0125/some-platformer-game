@@ -19,10 +19,13 @@ class Entity:
     def __init__(self, size: tuple, image_path: str, default_pos: list):
         self.size = size
         self.image_path = image_path
+
         self.default_pos = list(default_pos)
-        self.vx = 0
-        self.vy = 0
         self.velocity_cap = (20, 10)
+        self.vx = self.vy = 0
+
+        self.scroll_x = self.scroll_y = 0
+
         self.collision_types = {
             "top": False,
             "bottom": False,
@@ -115,7 +118,10 @@ class Entity:
             self.vy = 0
 
     def draw(self):
-        screen.blit(self.surface, (self.rect.left, self.rect.top))
+        screen.blit(
+            self.surface,
+            (self.rect.left - self.scroll_x, self.rect.top - self.scroll_y),
+        )
 
 
 ##############
@@ -168,5 +174,5 @@ class Player(Entity):
 
         # Reset
         if keys[pygame.K_r]:
-            self.vx, self.vy = (0, 0)
+            self.vx = self.vy = 0
             self.rect.center = self.default_pos

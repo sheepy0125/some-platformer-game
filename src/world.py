@@ -54,6 +54,10 @@ class World:
 
         Logger.log("Successfully created all tiles.")
 
+    def scroll_tiles(self, scroll_pos: tuple):  # or list
+        for tile in self.tile_map:
+            tile.scroll_x, tile.scroll_y = scroll_pos
+
     def draw_tiles(self):
         for tile in self.tile_map:
             tile.draw()
@@ -73,7 +77,7 @@ class Tile:
         self.create()
 
     def __str__(self):
-        return f"({self.x=},{self.y=}) {self.image_path=}"
+        return f"({self.x=},{self.y=}) {self.scroll_x=},{self.scroll_y=} {self.image_path=}"
 
     def create(self):
         self.surface = pygame.image.load(self.image_path).convert_alpha()
@@ -81,7 +85,7 @@ class Tile:
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
     def draw(self):
-        screen.blit(self.surface, (self.x + self.scroll_x, self.y + self.scroll_y))
+        screen.blit(self.surface, (self.x - self.scroll_x, self.y - self.scroll_y))
 
 
 ####################

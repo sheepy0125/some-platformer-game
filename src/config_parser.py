@@ -14,11 +14,15 @@ try:
 
     FPS = int(config_dict["fps"])
     GRAVITY = float(config_dict["gravity"])
+    SCROLL_OFFSET = int(config_dict["scrollOffset"])
 
 except Exception as error:
     Logger.log_error(error)
     exit(1)
 
+del CONFIG_FILE_PATH
+del config_dict
+del config_file
 del load
 
 Logger.log("Successfully loaded config")
