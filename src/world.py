@@ -1,7 +1,7 @@
 """
 Word class & data for Some Platformer Game
 Created by sheepy0125
-Source: https://youtu.be/abH2MSBdnW
+Source: https://youtu.be/abH2MSBdnWc
 09/10/2021
 """
 
@@ -78,7 +78,7 @@ class Tile:
     def create(self):
         self.surface = pygame.image.load(self.image_path).convert_alpha()
         self.surface = pygame.transform.scale(self.surface, (TILE_SIZE, TILE_SIZE))
-        # self.rect = self.surface.get_rect()
+        self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
     def draw(self):
         screen.blit(self.surface, (self.x, self.y))
