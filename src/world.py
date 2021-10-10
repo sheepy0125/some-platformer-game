@@ -5,8 +5,7 @@ Source: https://youtu.be/abH2MSBdnWc
 09/10/2021
 """
 
-from pygame_setup import screen, pygame
-from config_parser import SCREEN_SIZE
+from pygame_setup import screen, pygame, SCREEN_SIZE
 from utils import Logger, ROOT_PATH
 
 # Scale tile size to have height fill all the way

@@ -12,12 +12,13 @@ try:
     with open(CONFIG_FILE_PATH) as config_file:
         config_dict = load(config_file)
 
-    SCREEN_SIZE = tuple(config_dict["screenSize"])
     FPS = int(config_dict["fps"])
     GRAVITY = float(config_dict["gravity"])
 
 except Exception as error:
     Logger.log_error(error)
     exit(1)
+
+del load
 
 Logger.log("Successfully loaded config")
