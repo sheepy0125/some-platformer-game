@@ -13,6 +13,7 @@ from pathlib import Path
 from pygame_setup import *
 from world import Tile, load_world, TILE_SIZE
 from utils import Logger, ROOT_PATH
+from pygame_utils import Text
 
 # Setup
 pygame.display.set_caption("Map maker for Some Platformer Game")
@@ -64,6 +65,17 @@ def export():
 ############
 ### Main ###
 ############
+texts = [
+    Text("Map Maker for Some Platformer Game", size=12, pos=(SCREEN_SIZE[0] // 2, 15)),
+    Text("Press H to hide this text", size=12, pos=(SCREEN_SIZE[0] // 2, 30)),
+    Text("Press the arrow keys to scroll", size=12, pos=(SCREEN_SIZE[0] // 2, 45)),
+]
+currently_scrolling_text = Text(
+    f"Currently scrolling {scrolled_by} pixels ({scrolled_by // TILE_SIZE} times)",
+    size=12,
+    pos=(SCREEN_SIZE[0] // 2, 60),
+)
+show_text = True
 while True:
     # Event handler
     for event in pygame.event.get():
@@ -86,6 +98,10 @@ while True:
 
         # Keypress
         if event.type == pygame.KEYUP:
+            # Toggle text
+            if event.key == pygame.K_h:
+                show_text = not show_text
+
             # Scroll screen to the right
             if event.key == pygame.K_RIGHT:
                 scrolled_by += TILE_SIZE
@@ -96,8 +112,24 @@ while True:
                 scrolled_by -= TILE_SIZE
                 scroll_screen(-1)
 
+            # Not scrolling
+            else:
+                break
+
+            # Update scrolled text
+            currently_scrolling_text = Text(
+                f"Currently scrolling {scrolled_by} pixels ({scrolled_by // TILE_SIZE} times)",
+                size=12,
+                pos=(SCREEN_SIZE[0] // 2, 60),
+            )
+
     # Draw
     screen.fill("blue")
     for tile in tiles:
         tile.draw()
+    if show_text:
+        for text in texts:
+            text.draw()
+        currently_scrolling_text.draw()
     pygame.display.update()
+    clock.tick(15)
