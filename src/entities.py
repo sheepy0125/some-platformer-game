@@ -20,9 +20,9 @@ class Entity:
         self.size = size
         self.image_path = image_path
         self.pos = list(default_pos)
-        self.velocity = [0, 0]
+        self.vx = 0
+        self.vy = 0
         self.velocity_cap = (20, 10)
-        self.movement_multiplier = 0
         self.collision_types = {
             "top": False,
             "bottom": False,
@@ -40,8 +40,7 @@ class Entity:
         self.surface = pygame.transform.scale(self.surface, self.size)
         self.rect = self.surface.get_rect(center=self.pos)
 
-    def set_pos(self, new_pos: list):
-        self.rect.centerx, self.rect.centery = new_pos
+
 
     def get_tile_collisions(self, tile_rects: list):
         return [
@@ -59,20 +58,17 @@ class Entity:
         # Horizontal
 
         # Add velocity
-        self.velocity[0] += 10 * self.movement_multiplier
-        if abs(self.velocity[0] > self.velocity_cap[0]):
-            self.velocity[0] = self.velocity_cap[0]
+        if abs(self.vx > self.velocity_cap[0]):
+            self.vx = self.velocity_cap[0]
 
-        if self.movement_multiplier == 0:
-            self.velocity[0] = 0
+
 
         # Terminal velocity
-        if abs(self.velocity[0]) > self.velocity_cap[0]:
-            self.velocity[0] = self.velocity_cap[0] * self.movement_multiplier
+        # if abs(self.vy) < self.velocity_cap[1]:
+            # self.vy = self.velocity_cap[1]
 
         # Set position
-        new_pos = [self.rect.centerx + self.velocity[0], self.rect.centery]
-        self.set_pos(new_pos)
+        self.rect.x += self.vx
 
         # Check horizontal collision
         collision_list = self.get_tile_collisions(
@@ -80,12 +76,12 @@ class Entity:
         )
         for tile in collision_list:
             # Moving right
-            if self.velocity[0] > 0:
+            if self.vx > 0:
                 self.rect.right = tile.left
                 self.collision_types["right"] = True
 
             # Moving left
-            elif self.velocity[0] < 0:
+            elif self.vx < 0:
                 self.rect.left = tile.right
                 self.collision_types["left"] = True
 
@@ -93,14 +89,13 @@ class Entity:
                 break
 
             # Collided, reset the velocity
-            self.velocity[0] = 0
+            self.vx = 0
 
         # Vertical
 
         # Add velocity
-        self.velocity[1] += 1
-        new_pos = [self.rect.centerx, self.rect.centery + self.velocity[1]]
-        self.set_pos(new_pos)
+        self.vy += GRAVITY
+        self.rect.y += self.vy
 
         # Check vertical collision
         collision_list = self.get_tile_collisions(
@@ -108,12 +103,12 @@ class Entity:
         )
         for tile in collision_list:
             # Moving up
-            if self.velocity[1] < 0:
+            if self.vy < 0:
                 self.rect.top = tile.bottom
                 self.collision_types["top"] = True
 
             # Moving down
-            elif self.velocity[1] > 0:
+            elif self.vy > 0:
                 self.rect.bottom = tile.top
                 self.collision_types["bottom"] = True
 
@@ -121,7 +116,7 @@ class Entity:
                 break
 
             # Collided, reset the velocity
-            self.velocity[1] = 0
+            self.vy = 0
 
     def draw(self):
         screen.blit(self.surface, (self.rect.left, self.rect.top))
@@ -141,6 +136,7 @@ class Player(Entity):
         self.air_time = 0
         self.air_time_grace_period = 5
 
+
         Logger.log("Created player")
 
     def event_handler(self):
@@ -159,23 +155,24 @@ class Player(Entity):
                 self.collision_types["bottom"]
                 or self.air_time < self.air_time_grace_period
             ):
-                self.velocity[1] = -20 * GRAVITY_MULTIPLIER
+                self.vy = -20
+
 
         # Right
         if keys[pygame.K_RIGHT]:
-            self.movement_multiplier = 1
+            self.vx = 10
 
         # Left
         elif keys[pygame.K_LEFT]:
-            self.movement_multiplier = -1
+            self.vx = -10
 
         # None
         else:
-            self.movement_multiplier = 0
+            self.vx = 0
 
         # Other keys
 
         # Reset
         if keys[pygame.K_r]:
-            self.set_pos(self.pos)
             self.velocity = [0, 0]
+            self.rect.center = default_pos

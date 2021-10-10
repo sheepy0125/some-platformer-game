@@ -11,7 +11,7 @@ Created by duuuck and sheepy0125
 from pygame_setup import *
 from entities import *
 from utils import Logger, ROOT_PATH
-from world import *
+from world import * 
 from sys import exit
 
 # Create entities

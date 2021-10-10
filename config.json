@@ -1,5 +1,5 @@
 {
     "screenSize": [500, 500],
-    "fps": 30,
-    "gravityMultiplier": 1
+    "fps": 60,
+    "gravity": 1
 }
