@@ -32,7 +32,7 @@ while True:
             exit(0)
 
     player.movement_handler()
-    player.move()
+    player.move(all_tiles=world)
 
     # Draw
     screen.fill("blue")

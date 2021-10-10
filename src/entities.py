@@ -7,6 +7,7 @@ Created by duuuck and sheepy0125
 import pygame
 from pygame_setup import *
 from config_parser import *
+from world import World
 from utils import Logger, ROOT_PATH
 
 ##############
@@ -33,29 +34,88 @@ class Entity:
         self.surface = pygame.transform.scale(self.surface, self.size)
         self.rect = self.surface.get_rect(center=self.pos)
 
-    def move(self):
+    def set_pos(self, new_pos: list | tuple):
+        self.rect.centerx, self.rect.centery = new_pos
+
+    def get_tile_collisions(self, tile_rects: list):
+        return [
+            tile_rect for tile_rect in tile_rects if self.rect.colliderect(tile_rect)
+        ]
+
+    def move(self, all_tiles: World):
+        self.collision_types = {
+            "top": False,
+            "bottom": False,
+            "left": False,
+            "right": False,
+        }
+
+        # Horizontal
+
         # Add velocity
-        self.velocity[0] += 5 * self.movement_multiplier
+        self.velocity[0] += 10 * self.movement_multiplier
         if abs(self.velocity[0] > self.velocity_cap[0]):
             self.velocity[0] = self.velocity_cap[0]
+
+        if self.movement_multiplier == 0:
+            self.velocity[0] = 0
 
         # Terminal velocity
         if abs(self.velocity[0]) > self.velocity_cap[0]:
             self.velocity[0] = self.velocity_cap[0] * self.movement_multiplier
 
-        if self.movement_multiplier == 0:
-            self.velocity[0] = 0
-
-        new_pos = [self.rect.centerx + self.velocity[0], self.pos[1]]
-
+        # Set position
+        new_pos = [self.rect.centerx + self.velocity[0], self.rect.centery]
         self.set_pos(new_pos)
 
-    def set_pos(self, new_pos: tuple):
-        self.rect.centerx, self.rect.centery = new_pos
-        self.pos = list(new_pos)
+        # Check horizontal collision
+        collision_list = self.get_tile_collisions(
+            [tile.rect for tile in all_tiles.tile_map]
+        )
+        for tile in collision_list:
+            # Moving right
+            if self.velocity[0] > 0:
+                self.rect.right = tile.left
+                self.collision_types["right"] = True
 
-    def get_collisions(self, rects) -> list:
-        return [other_rect for other_rect in rects if self.rect.colliderect(other_rect)]
+            # Moving left
+            elif self.velocity[0] < 0:
+                self.rect.left = tile.right
+                self.collision_types["left"] = True
+
+            else:
+                break
+
+            # Collided, reset the velocity
+            self.velocity[0] = 0
+
+        # Vertical
+
+        # Add velocity
+        self.velocity[1] += 1
+        new_pos = [self.rect.centerx, self.rect.centery + self.velocity[1]]
+        self.set_pos(new_pos)
+
+        # Check vertical collision
+        collision_list = self.get_tile_collisions(
+            [tile.rect for tile in all_tiles.tile_map]
+        )
+        for tile in collision_list:
+            # Moving up
+            if self.velocity[1] < 0:
+                self.rect.top = tile.bottom
+                self.collision_types["top"] = True
+
+            # Moving down
+            elif self.velocity[1] > 0:
+                self.rect.bottom = tile.top
+                self.collision_types["bottom"] = True
+
+            else:
+                break
+
+            # Collided, reset the velocity
+            self.velocity[1] = 0
 
     def draw(self):
         screen.blit(self.surface, (self.rect.left, self.rect.top))
@@ -77,7 +137,11 @@ class Player(Entity):
     def movement_handler(self):
         keys: dict = pygame.key.get_pressed()
 
-        self.jump_gravity_handler(jump_pressed=keys[pygame.K_UP])
+        # Jump
+        if keys[pygame.K_UP]:
+            # Possible to jump
+            if self.collision_types["bottom"]:
+                self.velocity[1] = -20 * GRAVITY_MULTIPLIER
 
         # Right
         if keys[pygame.K_RIGHT]:
@@ -90,12 +154,3 @@ class Player(Entity):
         # None
         else:
             self.movement_multiplier = 0
-
-    def jump_gravity_handler(self, jump_pressed: bool):
-        # Gravity! (falling)
-        self.velocity[1] += GRAVITY_MULTIPLIER
-
-        if jump_pressed:
-            self.velocity[1] = -5 * (GRAVITY_MULTIPLIER * 2)
-
-        self.pos[1] += self.velocity[1]
