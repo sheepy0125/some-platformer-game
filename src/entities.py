@@ -40,7 +40,7 @@ class Entity:
         self.surface = pygame.transform.scale(self.surface, self.size)
         self.rect = self.surface.get_rect(center=self.pos)
 
-    def set_pos(self, new_pos: list | tuple):
+    def set_pos(self, new_pos: list):
         self.rect.centerx, self.rect.centery = new_pos
 
     def get_tile_collisions(self, tile_rects: list):
