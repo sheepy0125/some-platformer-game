@@ -55,6 +55,8 @@ def destroy_tile(mouse_pos):
 def scroll_screen(multiplier: int):
     for tile in tiles:
         tile.scroll_x += multiplier * TILE_SIZE
+        if tile.scroll_x < 0:
+            tile.scroll_x = 0
     # Logger.log(f"Scrolled tiles by {multiplier}. New scrolled by is {scrolled_by}")
 
 
