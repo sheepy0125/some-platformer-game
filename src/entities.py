@@ -23,6 +23,12 @@ class Entity:
         self.velocity = [0, 0]
         self.velocity_cap = (20, 10)
         self.movement_multiplier = 0
+        self.collision_types = {
+            "top": False,
+            "bottom": False,
+            "left": False,
+            "right": False,
+        }
 
         self.create()
 
@@ -132,15 +138,27 @@ class Player(Entity):
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
 
+        self.air_time = 0
+        self.air_time_grace_period = 5
+
         Logger.log("Created player")
 
-    def movement_handler(self):
+    def event_handler(self):
         keys: dict = pygame.key.get_pressed()
+
+        # Air time check (allowed to jump a bit after losing contact with ground)
+        if self.collision_types["bottom"]:
+            self.air_time = 0
+        else:
+            self.air_time += 1
 
         # Jump
         if keys[pygame.K_UP]:
             # Possible to jump
-            if self.collision_types["bottom"]:
+            if (
+                self.collision_types["bottom"]
+                or self.air_time < self.air_time_grace_period
+            ):
                 self.velocity[1] = -20 * GRAVITY_MULTIPLIER
 
         # Right
@@ -154,3 +172,10 @@ class Player(Entity):
         # None
         else:
             self.movement_multiplier = 0
+
+        # Other keys
+
+        # Reset
+        if keys[pygame.K_r]:
+            self.set_pos(self.pos)
+            self.velocity = [0, 0]

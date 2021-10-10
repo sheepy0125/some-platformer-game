@@ -21,7 +21,7 @@ entities: list[Entity] = []
 # Create world
 world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
 
-while True:
+while True or False == False:
     # Event handling
     for event in pygame.event.get():
         # Exit
@@ -31,7 +31,7 @@ while True:
             pygame.quit()
             exit(0)
 
-    player.movement_handler()
+    player.event_handler()
     player.move(all_tiles=world)
 
     # Draw
