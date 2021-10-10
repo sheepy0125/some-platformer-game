@@ -21,7 +21,6 @@ def new_rect(mouse_loc):
 	return pygame.Rect(snap_to_grid((mx,my)),(TILESIZE,TILESIZE))
 
 
-
 def export():
 	pass
 

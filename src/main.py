@@ -21,12 +21,11 @@ entities: list[Entity] = []
 # Create world
 world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
 
-while True or False == False:
+while True:
     # Event handling
     for event in pygame.event.get():
         # Exit
         if event.type == pygame.QUIT:
-            running = False
             Logger.log("Shutting down gracefully")
             pygame.quit()
             exit(0)
