@@ -84,7 +84,6 @@ def export(tiles):
 
         id_map[(tile.x//TILE_SIZE,tile.y//TILE_SIZE)] = tile.id
 
-    print(id_map)
 
     map_size = (
         far_tile_coords[0] // TILE_SIZE,
