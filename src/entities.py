@@ -118,9 +118,19 @@ class Entity:
             self.vy = 0
 
     def draw(self,scroll_x,scroll_y):
+        surface = self.surface
+        surface = pygame.transform
+        rect = self.rect.copy()
+
+        
+        if self.vy > 0:
+            surface = pygame.transform.scale(surface, (rect.width  - 6, rect.height + 6))
+            rect.x += 3
+            rect.y -= 3
+
         screen.blit(
-            self.surface,
-            (self.rect.left - scroll_x, self.rect.top - scroll_y),
+            surface,
+            (rect.left - scroll_x, rect.top - scroll_y),
         )
 
 
