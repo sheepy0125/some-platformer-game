@@ -117,10 +117,10 @@ class Entity:
             # Collided, reset the velocity
             self.vy = 0
 
-    def draw(self):
+    def draw(self,scroll_x,scroll_y):
         screen.blit(
             self.surface,
-            (self.rect.left - self.scroll_x, self.rect.top - self.scroll_y),
+            (self.rect.left - scroll_x, self.rect.top - scroll_y),
         )
 
 
