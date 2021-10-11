@@ -8,7 +8,6 @@ Created by duuuck and sheepy0125
 ### Setup ###
 #############
 # Import
-import pygame
 from pathlib import Path
 from pygame_setup import *
 from world import Tile, load_world, TILE_SIZE

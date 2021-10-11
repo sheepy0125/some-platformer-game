@@ -5,13 +5,8 @@ Source: https://youtu.be/abH2MSBdnWc
 09/10/2021
 """
 
-from pygame_setup import screen, pygame, SCREEN_SIZE
+from pygame_setup import screen, pygame, SCREEN_SIZE, TILE_SIZE
 from utils import Logger, ROOT_PATH
-
-# Scale tile size to have height fill all the way
-# For now, we can agree that the height of the maps will be 10
-MAP_HEIGHT = 10
-TILE_SIZE = round(SCREEN_SIZE[1] / MAP_HEIGHT)
 
 ###################
 ### World class ###

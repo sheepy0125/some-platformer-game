@@ -15,7 +15,7 @@ from world import *
 from sys import exit
 
 # Create entities
-player = Player()
+player = Player(size=(TILE_SIZE, TILE_SIZE * 2), size_modifier=(TILE_SIZE / 50))
 entities: list[Entity] = []
 
 # Create world
@@ -31,11 +31,11 @@ while True:
             exit(0)
 
     player.event_handler()
-    player.move(all_tiles=world)
+    player.move(world=world)
 
     # Scroll world
-    player.scroll_x += (player.rect.centerx - player.scroll_x - SCROLL_OFFSET) / 10
-    player.scroll_y += (player.rect.centery - player.scroll_y - 300) / 10
+    player.scroll_x += (player.rect.centerx - player.scroll_x - SCROLL_OFFSET) // 15
+    player.scroll_y += (player.rect.centery - player.scroll_y - 300) // 15
     world.scroll_tiles((player.scroll_x, player.scroll_y))
 
     # Draw

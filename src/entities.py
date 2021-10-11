@@ -4,7 +4,6 @@ Created by duuuck and sheepy0125
 08/10/2021
 """
 
-import pygame
 from pygame_setup import *
 from config_parser import *
 from world import World
@@ -16,12 +15,15 @@ from utils import Logger, ROOT_PATH
 class Entity:
     """Base entity class"""
 
-    def __init__(self, size: tuple, image_path: str, default_pos: list):
+    def __init__(
+        self, size: tuple, image_path: str, default_pos: list, size_modifier: int
+    ):
         self.size = size
+        self.size_modifier = size_modifier
         self.image_path = image_path
 
         self.default_pos = list(default_pos)
-        self.velocity_cap = (20, 10)
+        self.speed_cap = (10 // self.size_modifier, 20 // self.size_modifier)
         self.vx = self.vy = 0
 
         self.scroll_x = self.scroll_y = 0
@@ -48,7 +50,7 @@ class Entity:
             tile_rect for tile_rect in tile_rects if self.rect.colliderect(tile_rect)
         ]
 
-    def move(self, all_tiles: World):
+    def move(self, world: World):
         self.collision_types = {
             "top": False,
             "bottom": False,
@@ -59,19 +61,18 @@ class Entity:
         # Horizontal
 
         # Add velocity
-        if abs(self.vx > self.velocity_cap[0]):
-            self.vx = self.velocity_cap[0]
-
-        # Terminal velocity
-        # if abs(self.vy) < self.velocity_cap[1]:
-        # self.vy = self.velocity_cap[1]
+        if abs(self.vx) > self.speed_cap[0]:
+            if self.vx < 1:
+                self.vx = -self.speed_cap[0]
+            else:
+                self.vx = self.speed_cap[0]
 
         # Set position
         self.rect.x += self.vx
 
         # Check horizontal collision
         collision_list = self.get_tile_collisions(
-            [tile.rect for tile in all_tiles.tile_map]
+            [tile.rect for tile in world.tile_map]
         )
         for tile in collision_list:
             # Moving right
@@ -94,11 +95,11 @@ class Entity:
 
         # Add velocity
         self.vy += GRAVITY
-        self.rect.y += self.vy
+        self.rect.y += self.vy // self.size_modifier
 
         # Check vertical collision
         collision_list = self.get_tile_collisions(
-            [tile.rect for tile in all_tiles.tile_map]
+            [tile.rect for tile in world.tile_map]
         )
         for tile in collision_list:
             # Moving up
@@ -128,11 +129,12 @@ class Entity:
 ### Player ###
 ##############
 class Player(Entity):
-    def __init__(self):
+    def __init__(self, size: tuple, size_modifier: int):  # or list
         super().__init__(
-            size=(50, 100),
+            size=size,
             image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
-            default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
+            default_pos=((SCREEN_SIZE[0] // 2) // TILE_SIZE, SCREEN_SIZE[1] // 2),
+            size_modifier=size_modifier,
         )
 
         self.air_time = 0
@@ -156,15 +158,15 @@ class Player(Entity):
                 self.collision_types["bottom"]
                 or self.air_time < self.air_time_grace_period
             ):
-                self.vy = -20
+                self.vy = -self.speed_cap[1]
 
         # Right
         if keys[pygame.K_RIGHT]:
-            self.vx = 10
+            self.vx += 1
 
         # Left
         elif keys[pygame.K_LEFT]:
-            self.vx = -10
+            self.vx -= 1
 
         # None
         else:
