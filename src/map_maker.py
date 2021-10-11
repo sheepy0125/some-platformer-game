@@ -35,12 +35,8 @@ def find_tile(tile_pos):
 
     return False
 
+
 def tile_exists(tile_pos):
-    '''
-    tile_pos = list(tile_pos)
-    tile_pos[0] += scrolled_by
-    tile_pos = tuple(tile_pos)
-    '''
     for tile in tiles:
         if tile.rect.topleft == tile_pos:
             return True
@@ -55,19 +51,18 @@ def create_tile(mouse_pos):
     if tile_exists(tile_pos):
         return
 
-
     tiles.append(
         Tile(
             tile_pos,
             image_path=str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
-            id = 1
+            id=1,
         )
     )
 
 
 def destroy_tile(mouse_pos):
     tile_pos = snap_to_grid(mouse_pos)
-    if (tile_idx := find_tile(tile_pos)):
+    if tile_idx := find_tile(tile_pos):
         tiles.pop(tile_idx)
 
 
@@ -82,8 +77,7 @@ def export(tiles):
         if far_tile_coords[1] < tile.y:
             far_tile_coords[1] = tile.y
 
-        id_map[(tile.x//TILE_SIZE,tile.y//TILE_SIZE)] = tile.id
-
+        id_map[(tile.x // TILE_SIZE, tile.y // TILE_SIZE)] = tile.id
 
     map_size = (
         far_tile_coords[0] // TILE_SIZE,
@@ -95,7 +89,7 @@ def export(tiles):
     for i in range(map_size[0]):
         for j in range(map_size[1]):
             try:
-                file_text += str(id_map[(i,j)])
+                file_text += str(id_map[(i, j)])
             except KeyError:
                 file_text += "0"
 
@@ -103,7 +97,6 @@ def export(tiles):
 
     f = open("export.map", "x")
     f.write(file_text)
-
 
     return map_size
 
@@ -148,7 +141,6 @@ while True:
             elif event.key == pygame.K_e:
                 print(export(tiles))
 
-
             # Not scrolling
             else:
                 break
@@ -174,7 +166,7 @@ while True:
     # Draw
     screen.fill("blue")
     for tile in tiles:
-        tile.draw(scrolled_by,0)
+        tile.draw(scrolled_by, 0)
     if show_text:
         for text in texts:
             text.draw()
