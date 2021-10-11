@@ -105,14 +105,8 @@ while True:
 
             # Scroll screen to the left
             elif event.key == pygame.K_LEFT:
-<<<<<<< HEAD
                 if scroll_screen(-1):
                     scrolled_by -= TILE_SIZE
-=======
-                if scrolled_by != 0:
-                    scrolled_by -= TILE_SIZE
-                    scroll_screen(-1)
->>>>>>> fe2fbdb9dfceb9d08caf30656a1cb58bf307a2f1
 
             # Not scrolling
             else:
