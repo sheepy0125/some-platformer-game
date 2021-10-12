@@ -42,6 +42,7 @@ class Entity:
     def create(self):
         self.surface = pygame.image.load(self.image_path).convert_alpha()
         self.surface = pygame.transform.scale(self.surface, self.size)
+        self.fall_surf = pygame.transform.scale(self.surface, (self.size[0] - 6,self.size[1] + 6))
         self.rect = self.surface.get_rect(center=self.default_pos)
 
     def get_tile_collisions(self, tile_rects: list):
@@ -120,16 +121,16 @@ class Entity:
 
     def draw(self,scroll_x,scroll_y):
         surface = self.surface
-        draw_x =
-        draw_y = 
+        draw_x = self.rect.x
+        draw_y = self.rect.y
         if self.vy > 0:
             surface = self.fall_surf
-            rect.x += 3
-            rect.y -= 3
+            draw_x += 3
+            draw_y -= 3
 
         screen.blit(
             surface,
-            (rect.left - scroll_x, rect.top - scroll_y),
+            (draw_x - scroll_x, draw_y - scroll_y),
         )
 
 
