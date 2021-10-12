@@ -24,7 +24,6 @@ class Entity:
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
 
-
         self.scroll_x = self.scroll_y = 0
 
         self.collision_types = {
@@ -42,7 +41,9 @@ class Entity:
     def create(self):
         self.surface = pygame.image.load(self.image_path).convert_alpha()
         self.surface = pygame.transform.scale(self.surface, self.size)
-        self.fall_surf = pygame.transform.scale(self.surface, (self.size[0] - 6,self.size[1] + 6))
+        self.fall_surf = pygame.transform.scale(
+            self.surface, (self.size[0] - 6, self.size[1] + 6)
+        )
         self.rect = self.surface.get_rect(center=self.default_pos)
 
     def get_tile_collisions(self, tile_rects: list):
@@ -119,7 +120,7 @@ class Entity:
             # Collided, reset the velocity
             self.vy = 0
 
-    def draw(self,scroll_x,scroll_y):
+    def draw(self, scroll_x, scroll_y):
         surface = self.surface
         draw_x = self.rect.x
         draw_y = self.rect.y
