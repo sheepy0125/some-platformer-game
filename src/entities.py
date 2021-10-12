@@ -24,6 +24,7 @@ class Entity:
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
 
+
         self.scroll_x = self.scroll_y = 0
 
         self.collision_types = {
@@ -119,9 +120,10 @@ class Entity:
 
     def draw(self,scroll_x,scroll_y):
         surface = self.surface
-        rect = self.rect.copy()
+        draw_x =
+        draw_y = 
         if self.vy > 0:
-            surface = pygame.transform.scale(surface, (rect.width  - 6, rect.height + 6))
+            surface = self.fall_surf
             rect.x += 3
             rect.y -= 3
 
@@ -137,7 +139,7 @@ class Entity:
 class Player(Entity):
     def __init__(self):
         super().__init__(
-            size=(50, 100),
+            size=(30, 50),
             image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
