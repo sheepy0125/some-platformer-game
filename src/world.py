@@ -47,7 +47,7 @@ class World:
                             image_path=str(
                                 ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png",
                             ),
-                            id = 1
+                            id=1,
                         )
                     )
 
@@ -55,10 +55,9 @@ class World:
 
         Logger.log("Successfully created all tiles.")
 
-
-    def draw_tiles(self,scroll_x,scroll_y):
+    def draw_tiles(self, scroll_x, scroll_y):
         for tile in self.tile_map:
-            tile.draw(scroll_x,scroll_y)
+            tile.draw(scroll_x, scroll_y)
 
 
 ##################
@@ -67,10 +66,10 @@ class World:
 class Tile:
     """Base tile class"""
 
-    def __init__(self, pos: tuple, image_path: str, id: int):
+    def __init__(self, pos: tuple, image_path: str):
         self.x, self.y = pos
+        self.scroll_x, self.scroll_y = (0, 0)
         self.image_path = image_path
-        self.id = id
 
         self.create()
 
@@ -82,8 +81,8 @@ class Tile:
         self.surface = pygame.transform.scale(self.surface, (TILE_SIZE, TILE_SIZE))
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
-    def draw(self,scroll_x,scroll_y):
-        screen.blit(self.surface, (self.x - scroll_x, self.y - scroll_y))
+    def draw(self):
+        screen.blit(self.surface, (self.x - self.scroll_x, self.y - self.scroll_y))
 
 
 ####################
