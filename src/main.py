@@ -17,7 +17,6 @@ from sys import exit
 # Create entities
 player = Player()
 entities: list[Entity] = []
-scroll_x,scroll_y = 0,0
 
 # Create world
 world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
@@ -32,16 +31,18 @@ while True:
             exit(0)
 
     player.event_handler()
-    player.move(all_tiles=world)
+    player.move(world=world)
 
     # Scroll world
-    scroll_x += (player.rect.centerx - scroll_x - SCROLL_OFFSET) / 10
-    scroll_y += (player.rect.centery - scroll_y - 300) / 10
+    Scrolling.scroll_x += (
+        player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET
+    ) / 10
+    Scrolling.scroll_y += (player.rect.centery - Scrolling.scroll_y - 300) / 10
 
     # Draw
     screen.fill("blue")
-    world.draw_tiles(scroll_x,scroll_y)
-    player.draw(scroll_x,scroll_y)
+    world.draw_tiles()
+    player.draw()
     pygame.display.update()
 
     clock.tick(FPS)

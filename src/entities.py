@@ -8,7 +8,7 @@ import pygame
 from pygame_setup import *
 from config_parser import *
 from world import World
-from utils import Logger, ROOT_PATH
+from utils import Logger, Scrolling, ROOT_PATH
 
 ##############
 ### Entity ###
@@ -23,8 +23,6 @@ class Entity:
         self.default_pos = list(default_pos)
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
-
-        self.scroll_x = self.scroll_y = 0
 
         self.collision_types = {
             "top": False,
@@ -51,7 +49,7 @@ class Entity:
             tile_rect for tile_rect in tile_rects if self.rect.colliderect(tile_rect)
         ]
 
-    def move(self, all_tiles: World):
+    def move(self, world: World):
         self.collision_types = {
             "top": False,
             "bottom": False,
@@ -74,7 +72,7 @@ class Entity:
 
         # Check horizontal collision
         collision_list = self.get_tile_collisions(
-            [tile.rect for tile in all_tiles.tile_map]
+            [tile.rect for tile in world.tile_map]
         )
         for tile in collision_list:
             # Moving right
@@ -101,7 +99,7 @@ class Entity:
 
         # Check vertical collision
         collision_list = self.get_tile_collisions(
-            [tile.rect for tile in all_tiles.tile_map]
+            [tile.rect for tile in world.tile_map]
         )
         for tile in collision_list:
             # Moving up
@@ -120,7 +118,7 @@ class Entity:
             # Collided, reset the velocity
             self.vy = 0
 
-    def draw(self, scroll_x, scroll_y):
+    def draw(self):
         surface = self.surface
         draw_x = self.rect.x
         draw_y = self.rect.y
@@ -131,7 +129,7 @@ class Entity:
 
         screen.blit(
             surface,
-            (draw_x - scroll_x, draw_y - scroll_y),
+            (draw_x - Scrolling.scroll_x, draw_y - Scrolling.scroll_y),
         )
 
 

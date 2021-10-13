@@ -6,7 +6,7 @@ Source: https://youtu.be/abH2MSBdnWc
 """
 
 from pygame_setup import screen, pygame, SCREEN_SIZE
-from utils import Logger, ROOT_PATH
+from utils import Logger, Scrolling, ROOT_PATH
 
 # Scale tile size to have height fill all the way
 # For now, we can agree that the height of the maps will be 10
@@ -47,7 +47,7 @@ class World:
                             image_path=str(
                                 ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png",
                             ),
-                            id = 1
+                            id=1,
                         )
                     )
 
@@ -55,10 +55,9 @@ class World:
 
         Logger.log("Successfully created all tiles.")
 
-
-    def draw_tiles(self,scroll_x,scroll_y):
+    def draw_tiles(self):
         for tile in self.tile_map:
-            tile.draw(scroll_x,scroll_y)
+            tile.draw(Scrolling.scroll_x, Scrolling.scroll_y)
 
 
 ##################
@@ -82,7 +81,7 @@ class Tile:
         self.surface = pygame.transform.scale(self.surface, (TILE_SIZE, TILE_SIZE))
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
-    def draw(self,scroll_x,scroll_y):
+    def draw(self, scroll_x: float, scroll_y: float):
         screen.blit(self.surface, (self.x - scroll_x, self.y - scroll_y))
 
 

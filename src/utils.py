@@ -41,3 +41,11 @@ class Logger:
         Logger.fatal(
             f"{type(error).__name__}: {str(error)} (line {error.__traceback__.tb_lineno})"
         )
+
+
+#############################
+### Scroll handling class ###
+#############################
+class Scrolling:
+    scroll_x: float = 0
+    scroll_y: float = 0
