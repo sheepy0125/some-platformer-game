@@ -24,6 +24,8 @@ class Entity:
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
 
+        self.land_time = 0
+
         self.scroll_x = self.scroll_y = 0
 
         self.collision_types = {
@@ -32,6 +34,7 @@ class Entity:
             "left": False,
             "right": False,
         }
+        self.prev_on_ground = False
 
         self.create()
 
@@ -44,6 +47,9 @@ class Entity:
         self.fall_surf = pygame.transform.scale(
             self.surface, (self.size[0] - 6, self.size[1] + 6)
         )
+        self.land_surf = pygame.transform.scale(
+            self.surface, (self.size[0] + 10, self.size[1] - 10)
+        )
         self.rect = self.surface.get_rect(center=self.default_pos)
 
     def get_tile_collisions(self, tile_rects: list):
@@ -52,14 +58,16 @@ class Entity:
         ]
 
     def move(self, all_tiles: World):
+
+        self.land_time += 1
+
+        # Horizontal
         self.collision_types = {
             "top": False,
             "bottom": False,
             "left": False,
             "right": False,
         }
-
-        # Horizontal
 
         # Add velocity
         if abs(self.vx > self.velocity_cap[0]):
@@ -113,12 +121,18 @@ class Entity:
             elif self.vy > 0:
                 self.rect.bottom = tile.top
                 self.collision_types["bottom"] = True
+                if not self.prev_on_ground:
+                    self.land_time = 0
 
             else:
                 break
 
+
             # Collided, reset the velocity
             self.vy = 0
+
+        self.prev_on_ground = self.collision_types["bottom"]
+        
 
     def draw(self, scroll_x, scroll_y):
         surface = self.surface
@@ -129,6 +143,10 @@ class Entity:
             draw_x += 3
             draw_y -= 3
 
+        elif self.land_time < 6:
+            surface = self.land_surf
+            draw_x -= 5
+            draw_y += 10
         screen.blit(
             surface,
             (draw_x - scroll_x, draw_y - scroll_y),
