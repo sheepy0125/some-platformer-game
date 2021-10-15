@@ -129,6 +129,7 @@ class Entity:
             self.vy = 0
 
         self.prev_on_ground = self.collision_types["bottom"]
+
     def draw(self):
         # Squashing and stretching
         surface = self.surface
@@ -136,7 +137,7 @@ class Entity:
         draw_y = self.rect.y
 
         # Stretching
-        if self.vy > 0:
+        if not self.collision_types["bottom"]:
             surface = self.fall_surf
             draw_x += 3
             draw_y -= 3
