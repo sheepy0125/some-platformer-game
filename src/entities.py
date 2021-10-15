@@ -129,22 +129,28 @@ class Entity:
             # Collided, reset the velocity
             self.vy = 0
 
-    def draw(self,scroll_x,scroll_y):
+    def draw(self):
+        # Squashing and stretching
         surface = self.surface
         draw_x = self.rect.x
         draw_y = self.rect.y
-        if self.vy > 0:
+
+        # Stretching
+        if not self.collision_types["bottom"]:
             surface = self.fall_surf
             draw_x += 3
             draw_y -= 3
 
+        # Squashing
         elif self.land_time < 6:
             surface = self.land_surf
             draw_x -= 5
             draw_y += 10
+
+        # Draw
         screen.blit(
             surface,
-            (draw_x - scroll_x, draw_y - scroll_y),
+            (draw_x - Scrolling.scroll_x, draw_y - Scrolling.scroll_y),
         )
 
 

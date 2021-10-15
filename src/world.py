@@ -55,9 +55,9 @@ class World:
 
         Logger.log("Successfully created all tiles.")
 
-    def draw_tiles(self,scroll_x: float,scroll_y):
+    def draw_tiles(self):
         for tile in self.tile_map:
-            tile.draw(scroll_x, scroll_y)
+            tile.draw()
 
 
 ##################
@@ -82,8 +82,10 @@ class Tile:
         self.surface = pygame.transform.scale(self.surface, (TILE_SIZE, TILE_SIZE))
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
-    def draw(self, scroll_x: float, scroll_y: float):
-        screen.blit(self.surface, (self.x - scroll_x, self.y - scroll_y))
+    def draw(self):
+        screen.blit(
+            self.surface, (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y)
+        )
 
 
 ####################

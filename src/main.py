@@ -7,7 +7,7 @@ Created by duuuck and sheepy0125
 #############
 ### Setup ###
 #############
-# Import    
+# Import
 from pygame_setup import *
 from entities import *
 from utils import Logger, ROOT_PATH
@@ -34,15 +34,15 @@ while True:
     player.move(world=world)
 
     # Scroll world
-    scroll_x += (
-        player.rect.centerx - scroll_x - SCROLL_OFFSET
+    Scrolling.scroll_x += (
+        player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET
     ) / 10
-    scroll_y += (player.rect.centery - scroll_y - 300) / 10
+    Scrolling.scroll_y += (player.rect.centery - Scrolling.scroll_y - 300) / 10
 
     # Draw
     screen.fill("blue")
-    world.draw_tiles(scroll_x,scroll_y)
-    player.draw(scroll_x,scroll_y)
+    world.draw_tiles()
+    player.draw()
     pygame.display.update()
 
     clock.tick(FPS)
