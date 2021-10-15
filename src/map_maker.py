@@ -8,6 +8,7 @@ Created by duuuck and sheepy0125
 ### Setup ###
 #############
 # Import
+# FIXME: fix imports
 from pathlib import Path
 from tkinter import Tk, Label, Button
 from tkinter.ttk import Spinbox

@@ -4,11 +4,10 @@ Created by duuuck and sheepy0125
 08/10/2021
 """
 
-import pygame
-from pygame_setup import *
-from config_parser import *
-from world import World
+from pygame_setup import pygame, screen, SCREEN_SIZE
+from config_parser import FPS, GRAVITY, SCROLL_OFFSET
 from utils import Logger, Scrolling, ROOT_PATH
+from world import World
 
 ##############
 ### Entity ###

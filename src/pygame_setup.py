@@ -5,7 +5,7 @@ Created by sheepy0125
 """
 
 import pygame
-from config_parser import *
+from config_parser import FPS, GRAVITY, SCROLL_OFFSET
 
 SCREEN_SIZE = (500, 500)
 screen = pygame.display.set_mode(SCREEN_SIZE)

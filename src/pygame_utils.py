@@ -4,7 +4,7 @@ Created by sheepy0125
 10/10/2021
 """
 
-from pygame_setup import *
+from pygame_setup import pygame, screen, SCREEN_SIZE
 
 pygame.font.init()
 
