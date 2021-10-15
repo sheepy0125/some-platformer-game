@@ -58,7 +58,6 @@ class Entity:
     def move(self, world: World):
 
         self.land_time += 1
-        self.prev_on_ground = self.collision_types["bottom"]
 
         # Horizontal
         self.collision_types = {
@@ -129,6 +128,7 @@ class Entity:
             # Collided, reset the velocity
             self.vy = 0
 
+        self.prev_on_ground = self.collision_types["bottom"]
     def draw(self):
         # Squashing and stretching
         surface = self.surface
@@ -136,7 +136,7 @@ class Entity:
         draw_y = self.rect.y
 
         # Stretching
-        if not self.collision_types["bottom"]:
+        if self.vy > 0:
             surface = self.fall_surf
             draw_x += 3
             draw_y -= 3
