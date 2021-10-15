@@ -58,6 +58,7 @@ class Entity:
     def move(self, world: World):
 
         self.land_time += 1
+        self.prev_on_ground = self.collision_types["bottom"]
 
         # Horizontal
         self.collision_types = {
@@ -128,7 +129,7 @@ class Entity:
             # Collided, reset the velocity
             self.vy = 0
 
-    def draw(self):
+    def draw(self,scroll_x,scroll_y):
         surface = self.surface
         draw_x = self.rect.x
         draw_y = self.rect.y
@@ -143,7 +144,7 @@ class Entity:
             draw_y += 10
         screen.blit(
             surface,
-            (draw_x - Scrolling.scroll_x, draw_y - Scrolling.scroll_y),
+            (draw_x - scroll_x, draw_y - scroll_y),
         )
 
 

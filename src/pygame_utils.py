@@ -95,3 +95,4 @@ class CenterRect:
 
     def draw(self):
         pygame.draw.rect(screen, self.color, self.rect)
+        
