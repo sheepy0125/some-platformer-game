@@ -55,9 +55,9 @@ class World:
 
         Logger.log("Successfully created all tiles.")
 
-    def draw_tiles(self):
+    def draw_tiles(self,scroll_x: float,scroll_y):
         for tile in self.tile_map:
-            tile.draw(Scrolling.scroll_x, Scrolling.scroll_y)
+            tile.draw(scroll_x, scroll_y)
 
 
 ##################
