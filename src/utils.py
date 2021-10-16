@@ -6,6 +6,7 @@ Created by sheepy0125
 
 from pathlib import Path
 
+
 ###############
 ### Globals ###
 ###############
@@ -49,3 +50,4 @@ class Logger:
 class Scrolling:
     scroll_x: float = 0
     scroll_y: float = 0
+    frame : float = 0

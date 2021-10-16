@@ -11,3 +11,5 @@ SCREEN_SIZE = (500, 500)
 screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Some Platformer Game")
 clock = pygame.time.Clock()
+
+frame = 0.0 

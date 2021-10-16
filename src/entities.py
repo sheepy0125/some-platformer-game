@@ -10,6 +10,9 @@ from config_parser import *
 from world import World
 from utils import Logger, Scrolling, ROOT_PATH
 
+
+from time import time
+
 ##############
 ### Entity ###
 ##############
@@ -55,9 +58,8 @@ class Entity:
             tile_rect for tile_rect in tile_rects if self.rect.colliderect(tile_rect)
         ]
 
-    def move(self, world: World):
-
-        self.land_time += 1
+    def move(self,time_elapsed, world: World):
+        time_dif = frame - time()
 
         # Horizontal
         self.collision_types = {
@@ -76,7 +78,7 @@ class Entity:
         # self.vy = self.velocity_cap[1]
 
         # Set position
-        self.rect.x += self.vx
+        self.rect.x += round(self.vx * time_elapsed * 60)
 
         # Check horizontal collision
         collision_list = self.get_tile_collisions(
@@ -93,8 +95,6 @@ class Entity:
                 self.rect.left = tile.right
                 self.collision_types["left"] = True
 
-            else:
-                break
 
             # Collided, reset the velocity
             self.vx = 0
@@ -120,10 +120,8 @@ class Entity:
                 self.rect.bottom = tile.top
                 self.collision_types["bottom"] = True
                 if not self.prev_on_ground:
-                    self.land_time = 0
+                    self.land_time = time()
 
-            else:
-                break
 
             # Collided, reset the velocity
             self.vy = 0
@@ -142,7 +140,7 @@ class Entity:
             draw_y -= 3
 
         # Squashing
-        elif self.land_time < 6:
+        elif time() - self.land_time < .1:
             surface = self.land_surf
             draw_x -= 5
             draw_y += 10
@@ -152,7 +150,6 @@ class Entity:
             surface,
             (draw_x - Scrolling.scroll_x, draw_y - Scrolling.scroll_y),
         )
-
 
 ##############
 ### Player ###
@@ -173,18 +170,17 @@ class Player(Entity):
     def event_handler(self):
         keys: dict = pygame.key.get_pressed()
 
+
         # Air time check (allowed to jump a bit after losing contact with ground)
         if self.collision_types["bottom"]:
-            self.air_time = 0
-        else:
-            self.air_time += 1
+            self.air_time = time()
 
         # Jump
         if keys[pygame.K_UP]:
             # Possible to jump
             if (
                 self.collision_types["bottom"]
-                or self.air_time < self.air_time_grace_period
+                or self.air_time < self.air_time_grace_period/60
             ):
                 self.vy = -20
 
