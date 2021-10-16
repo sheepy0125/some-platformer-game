@@ -10,98 +10,103 @@ Created by duuuck and sheepy0125
 # Import
 # FIXME: fix imports
 from pathlib import Path
-from tkinter import Tk, Label, Button
+from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
-from pygame_setup import *
+from pygame_setup import pygame, screen, clock, SCREEN_SIZE
 from world import Tile, load_world, TILE_SIZE
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 
 # Setup
 pygame.display.set_caption("Map maker for Some Platformer Game")
-tiles = []
-Scrolling.scroll_x = 0
+
+###############
+### Classes ###
+###############
+class TileMap:
+    tile_map = []
+
+    @staticmethod
+    def create_tile_2d_array(map_size: tuple) -> list[list]:
+        tile_map = []
+        # Rows
+        for _ in range(map_size[1]):
+            # Create list of zeros
+            tile_map.append([None for _ in range(map_size[0])])
+
+        TileMap.tile_map = tile_map
+        Logger.log("Created tile map")
+
 
 #################
 ### Functions ###
 #################
-def snap_to_grid(location) -> list:
-    return tuple([(int(location[i] / TILE_SIZE) * TILE_SIZE) for i in range(2)])
+def snap_to_grid(mouse_pos: tuple) -> tuple:
+    """Returns the top left coordinate of a tile from a mouse position"""
+
+    return tuple([(int(mouse_pos[i] / TILE_SIZE) * TILE_SIZE) for i in range(2)])
 
 
-def find_tile(tile_pos):
-    """Only finds the first tile"""
+def get_tile_idx(tile_location: tuple) -> tuple:
+    """
+    Get the tile indecies of a tile location (top left)
+    Returns a tuple with the first index being the row index and the
+    second index being the column index (it's a 2D map)
+    """
 
-    for tile_idx, tile in enumerate(tiles):
-        if (tile.x - tile.scroll_x, tile.y) == tuple(tile_pos):
-            return tile_idx
+    tile_idx = (
+        ((tile_location[0] + Scrolling.scroll_x) // TILE_SIZE),
+        (tile_location[1] // TILE_SIZE),
+    )
+    return tile_idx
 
-    return False
 
-
-def tile_exists(tile_pos):
-    for tile in tiles:
-        if tile.rect.topleft == tile_pos:
-            return True
-
-    return False
+def tile_exists(tile_pos: tuple, tile_idx: tuple):
+    return TileMap.tile_map[tile_idx[1]][tile_idx[0]] is not None
 
 
 def create_tile(mouse_pos):
-    mouse_pos = list(mouse_pos)
-    mouse_pos[0] += Scrolling.scroll_x
     tile_pos = snap_to_grid(mouse_pos)
-    if tile_exists(tile_pos):
+    tile_idx = get_tile_idx(tile_pos)
+    if tile_exists(tile_pos, tile_idx):
         return
 
-    tiles.append(
-        Tile(
-            tile_pos,
-            image_path=str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
-            id=1,
-        )
+    TileMap.tile_map[tile_idx[1]][tile_idx[0]] = Tile(
+        (tile_pos[0] + Scrolling.scroll_x, tile_pos[1] + Scrolling.scroll_y),
+        image_path=str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
+        id=1,
     )
 
 
 def destroy_tile(mouse_pos):
-    tile_pos = snap_to_grid(mouse_pos)
-    if tile_idx := find_tile(tile_pos):
-        tiles.pop(tile_idx)
+    tile_idx = get_tile_idx(snap_to_grid(mouse_pos))
+    TileMap.tile_map[tile_idx[1]][tile_idx[0]] = None
 
 
 def export(tiles):
-    # export tiles into
-    id_map = {}
-    far_tile_coords = [0, 0]
+    # Map string
+    export_text = ""
+    for tile_row in TileMap.tile_map:
+        for tile in tile_row:
+            # Tile doesn't exist (air)
+            if tile is None:
+                export_text += "0"
+                continue
 
-    for tile in tiles:
-        if far_tile_coords[0] < tile.x:
-            far_tile_coords[0] = tile.x
-        if far_tile_coords[1] < tile.y:
-            far_tile_coords[1] = tile.y
+            # Use tile ID
+            export_text += str(tile.id)
 
-        id_map[(tile.x // TILE_SIZE, tile.y // TILE_SIZE)] = tile.id
+        export_text += "\n"
 
-    map_size = (
-        far_tile_coords[0] // TILE_SIZE,
-        far_tile_coords[1] // TILE_SIZE,
-    )  # get map tile width and height
+    # Get filepath to export to
+    map_file = filedialog.asksaveasfile()
+    Logger.log(f"Exporting map to {map_file.name}")
 
-    file_text = ""
+    with map_file:
+        map_file.truncate(0)
+        map_file.write(export_text)
 
-    for i in range(map_size[0]):
-        for j in range(map_size[1]):
-            try:
-                file_text += str(id_map[(i, j)])
-            except KeyError:
-                file_text += "0"
-
-        file_text += "\n"
-
-    f = open("export.map", "x")
-    f.write(file_text)
-
-    return map_size
+    Logger.log("Successfully exported map")
 
 
 #################
@@ -135,7 +140,7 @@ def map_setup() -> tuple:
 
     Label(root, text="Map maker setup").pack(pady=2)
 
-    width_spinbox = Spinbox(root, from_=20, to=60)
+    width_spinbox = Spinbox(root, from_=20, to=500)
     height_spinbox = Spinbox(
         root, from_=10, to=10
     )  # TODO: scrolling vertically instead of fixed
@@ -160,7 +165,12 @@ def map_setup() -> tuple:
 ############
 def main():
     map_size = map_setup()
-    max_scroll_x = map_size[0] * TILE_SIZE
+    max_scroll_x = (map_size[0] * TILE_SIZE) - (
+        (SCREEN_SIZE[0] // TILE_SIZE)
+    ) * TILE_SIZE
+    print(max_scroll_x)
+
+    TileMap.create_tile_2d_array(map_size)
 
     texts = [
         Text(
@@ -169,12 +179,13 @@ def main():
             pos=(SCREEN_SIZE[0] // 2, 15),
         ),
         Text("Press H to toggle this text", size=12, pos=(SCREEN_SIZE[0] // 2, 30)),
-        Text("Press the arrow keys to scroll", size=12, pos=(SCREEN_SIZE[0] // 2, 45)),
+        Text("Press R to reset", size=12, pos=(SCREEN_SIZE[0] // 2, 45)),
+        Text("Press the arrow keys to scroll", size=12, pos=(SCREEN_SIZE[0] // 2, 60)),
     ]
     currently_scrolling_text = Text(
         f"Currently scrolling {Scrolling.scroll_x // TILE_SIZE} times",
         size=12,
-        pos=(SCREEN_SIZE[0] // 2, 60),
+        pos=(SCREEN_SIZE[0] // 2, 75),
     )
     show_text = True
     while True:
@@ -191,6 +202,10 @@ def main():
                 if event.key == pygame.K_h:
                     show_text = not show_text
 
+                # Reset map
+                elif event.key == pygame.K_r:
+                    TileMap.create_tile_2d_array(map_size)
+
                 # Scroll screen to the right
                 if event.key == pygame.K_RIGHT:
                     if Scrolling.scroll_x < max_scroll_x:
@@ -202,7 +217,12 @@ def main():
                         Scrolling.scroll_x -= TILE_SIZE
 
                 elif event.key == pygame.K_e:
-                    print(export(tiles))
+                    try:
+                        pass
+                    except Exception as error:
+                        Logger.fatal("Failed to export map")
+                        Logger.log_error(error)
+                    export(TileMap.tile_map)
 
                 # Not scrolling
                 else:
@@ -210,9 +230,11 @@ def main():
 
                 # Update scrolled text
                 currently_scrolling_text = Text(
-                    f"Currently scrolling {Scrolling.scroll_x} pixels ({Scrolling.scroll_x // TILE_SIZE} times out of {map_size[0]})",
+                    f"Currently scrolling {Scrolling.scroll_x} pixels "
+                    + f"({Scrolling.scroll_x // TILE_SIZE} times out of "
+                    + f"{max_scroll_x // TILE_SIZE})",
                     size=12,
-                    pos=(SCREEN_SIZE[0] // 2, 60),
+                    pos=(SCREEN_SIZE[0] // 2, 75),
                 )
 
         # Mouse click
@@ -229,12 +251,16 @@ def main():
 
         # Draw
         screen.fill("blue")
-        for tile in tiles:
-            tile.draw(Scrolling.scroll_x, 0)
+        for tile_row in TileMap.tile_map:  # 2D Array, so both row and tile
+            for tile in tile_row:
+                if tile is not None:
+                    tile.draw()
+
         if show_text:
             for text in texts:
                 text.draw()
             currently_scrolling_text.draw()
+
         pygame.display.update()
         clock.tick(60)
 

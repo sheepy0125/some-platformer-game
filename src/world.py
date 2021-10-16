@@ -68,7 +68,6 @@ class Tile:
 
     def __init__(self, pos: tuple, image_path: str, id: int):
         self.x, self.y = pos
-        self.scroll_x, self.scroll_y = (0, 0)
         self.image_path = image_path
         self.id = id
 
