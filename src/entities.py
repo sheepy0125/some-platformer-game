@@ -101,7 +101,7 @@ class Entity:
         # Vertical
 
         # Add velocity
-        self.vy += GRAVITY
+        self.vy += GRAVITY * 1.5
         self.rect.y += self.vy
 
         # Check vertical collision
