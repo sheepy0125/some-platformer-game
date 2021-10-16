@@ -180,13 +180,10 @@ class Player(Entity):
             self.air_time += 1
 
         # Jump
-        if keys[pygame.K_UP]:
-            # Possible to jump
-            if (
-                self.collision_types["bottom"]
-                or self.air_time < self.air_time_grace_period
-            ):
-                self.vy = -20
+        if keys[pygame.K_UP] and (
+            self.collision_types["bottom"] or self.air_time < self.air_time_grace_period
+        ):
+            self.vy = -20
 
         # Right
         if keys[pygame.K_RIGHT]:

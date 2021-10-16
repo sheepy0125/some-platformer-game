@@ -11,8 +11,8 @@ Created by duuuck and sheepy0125
 from pygame_setup import pygame, screen, clock, SCREEN_SIZE
 from config_parser import SCROLL_OFFSET, FPS
 from entities import Player, Entity
-from utils import Logger, ROOT_PATH
-from world import *
+from utils import Logger, Scrolling, ROOT_PATH
+from world import World, load_world
 from sys import exit
 
 # Create entities

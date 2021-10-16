@@ -8,7 +8,6 @@ Created by duuuck and sheepy0125
 ### Setup ###
 #############
 # Import
-# FIXME: fix imports
 from pathlib import Path
 from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
@@ -165,9 +164,7 @@ def map_setup() -> tuple:
 ############
 def main():
     map_size = map_setup()
-    max_scroll_x = (map_size[0] * TILE_SIZE) - (
-        (SCREEN_SIZE[0] // TILE_SIZE)
-    ) * TILE_SIZE
+    max_scroll_x = (map_size[0] * TILE_SIZE) - (SCREEN_SIZE[0] // TILE_SIZE) * TILE_SIZE
     print(max_scroll_x)
 
     TileMap.create_tile_2d_array(map_size)
@@ -218,11 +215,10 @@ def main():
 
                 elif event.key == pygame.K_e:
                     try:
-                        pass
+                        export(TileMap.tile_map)
                     except Exception as error:
                         Logger.fatal("Failed to export map")
                         Logger.log_error(error)
-                    export(TileMap.tile_map)
 
                 # Not scrolling
                 else:
