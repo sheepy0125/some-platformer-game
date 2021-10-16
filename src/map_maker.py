@@ -303,6 +303,9 @@ def main():
     max_scroll_x = (map_size[0] * TILE_SIZE) - (
         (SCREEN_SIZE[0] - SIDEBAR_SIZE[0]) // TILE_SIZE
     ) * TILE_SIZE
+    max_scroll_y = -(map_size[1] * TILE_SIZE)
+
+    print(max_scroll_y)
 
     sidebar = Sidebar()
     TileMap.create_tile_2d_array(map_size)
@@ -332,6 +335,16 @@ def main():
                 elif event.key == pygame.K_LEFT:
                     if Scrolling.scroll_x != 0:
                         Scrolling.scroll_x -= TILE_SIZE
+
+                # Scroll screen up
+                elif event.key == pygame.K_UP:
+                    if Scrolling.scroll_y > max_scroll_y:
+                        Scrolling.scroll_y -= TILE_SIZE
+
+                # Scroll screen down
+                elif event.key == pygame.K_DOWN:
+                    if Scrolling.scroll_y != 0:
+                        Scrolling.scroll_y += TILE_SIZE
 
                 elif event.key == pygame.K_e:
                     try:
