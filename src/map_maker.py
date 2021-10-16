@@ -8,13 +8,18 @@ Created by duuuck and sheepy0125
 ### Setup ###
 #############
 # Import
+import pygame
 from pathlib import Path
 from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
-from pygame_setup import pygame, screen, clock, SCREEN_SIZE
 from world import Tile, load_world, TILE_SIZE
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
+
+SCREEN_SIZE = (800, 800)
+SIDEBAR_SIZE = (200, 800)
+screen = pygame.display.set_mode(SCREEN_SIZE)
+clock = pygame.time.Clock()
 
 # Setup
 pygame.display.set_caption("Map maker for Some Platformer Game")
@@ -22,6 +27,17 @@ pygame.display.set_caption("Map maker for Some Platformer Game")
 ###############
 ### Classes ###
 ###############
+class Tiles:
+    tile_dict = {
+        "1": {
+            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
+            "name": "dirt",
+        }
+    }
+    current_tile = 1
+    total_tiles = 0
+
+
 class TileMap:
     tile_map = []
 
@@ -35,6 +51,115 @@ class TileMap:
 
         TileMap.tile_map = tile_map
         Logger.log("Created tile map")
+
+
+class Sidebar:
+    def __init__(self):
+        # Background
+        self.background_rect = pygame.Rect((0, 0), (SIDEBAR_SIZE[0], SIDEBAR_SIZE[1]))
+
+        # Texts
+        self.texts = [
+            Text(
+                "Map Maker!",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 15),
+            ),
+            Text(
+                "LMB: Place, RMB: Destroy",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 30),
+            ),
+            Text(
+                "Press the arrow keys to scroll",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 45),
+            ),
+            Text(
+                "Press R to reset",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 60),
+            ),
+            Text(
+                "Press E to Export",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 75),
+            ),
+            Text(
+                "Press N to switch to the next block",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 105),
+            ),
+            Text(
+                "Press P to switch to the prev block",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 120),
+            ),
+            Text(
+                "Available tiles",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 210 + 128),
+            ),
+            Text(
+                f"{MapSize.size[0]}x{MapSize.size[1]}",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - 15),
+            ),
+        ]
+        self.create_scroll_text()
+        self.create_current_tile_widgets()
+        self.create_total_tiles_text()
+
+        # Available tile texts
+        self.available_tile_texts = []
+        for tile_idx, available_tile in enumerate(Tiles.tile_dict.values()):
+            print(tile_idx, available_tile)
+            self.available_tile_texts.append(
+                Text(
+                    f"Tile {tile_idx + 1}: {available_tile['name']}",
+                    size=12,
+                    pos=(SIDEBAR_SIZE[0] // 2, (225 + 128 + (15 * tile_idx))),
+                )
+            )
+
+    def create_scroll_text(self):
+        self.currently_scrolling_text = Text(
+            f"Scroll X: {Scrolling.scroll_x} | Scroll Y: {Scrolling.scroll_y}",
+            size=12,
+            pos=(SIDEBAR_SIZE[0] // 2, 150),
+        )
+
+    def create_current_tile_widgets(self):
+        self.current_tile_text = Text(
+            f"Current tile: {Tiles.tile_dict[str(Tiles.current_tile)]['name']}",
+            size=12,
+            pos=(SIDEBAR_SIZE[0] // 2, 180),
+        )
+        self.current_tile_image = pygame.transform.scale(
+            pygame.image.load(Tiles.tile_dict[str(Tiles.current_tile)]["filepath"]),
+            (128, 128),
+        )
+        self.current_tile_image_rect = self.current_tile_image.get_rect(
+            centerx=(SIDEBAR_SIZE[0] // 2), top=195
+        )
+
+    def create_total_tiles_text(self):
+        self.total_tiles_text = Text(
+            f"Total tiles: {Tiles.total_tiles}",
+            size=12,
+            pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - 30),
+        )
+
+    def draw(self):
+        pygame.draw.rect(screen, rect=self.background_rect, color="black")
+        for text in self.texts:
+            text.draw()
+        for text in self.available_tile_texts:
+            text.draw()
+        self.currently_scrolling_text.draw()
+        self.current_tile_text.draw()
+        self.total_tiles_text.draw()
+        screen.blit(self.current_tile_image, self.current_tile_image_rect)
 
 
 #################
@@ -53,11 +178,11 @@ def get_tile_idx(tile_location: tuple) -> tuple:
     second index being the column index (it's a 2D map)
     """
 
-    tile_idx = (
-        ((tile_location[0] + Scrolling.scroll_x) // TILE_SIZE),
-        (tile_location[1] // TILE_SIZE),
+    return (
+        ((tile_location[0] + Scrolling.scroll_x) // TILE_SIZE)
+        - SIDEBAR_SIZE[0] // TILE_SIZE,
+        (tile_location[1] + Scrolling.scroll_y) // TILE_SIZE,
     )
-    return tile_idx
 
 
 def tile_exists(tile_pos: tuple, tile_idx: tuple):
@@ -71,15 +196,24 @@ def create_tile(mouse_pos):
         return
 
     TileMap.tile_map[tile_idx[1]][tile_idx[0]] = Tile(
-        (tile_pos[0] + Scrolling.scroll_x, tile_pos[1] + Scrolling.scroll_y),
+        (
+            tile_pos[0] + Scrolling.scroll_x,
+            tile_pos[1] + Scrolling.scroll_y,
+        ),
         image_path=str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
         id=1,
     )
+    Tiles.total_tiles += 1
 
 
 def destroy_tile(mouse_pos):
-    tile_idx = get_tile_idx(snap_to_grid(mouse_pos))
+    tile_pos = snap_to_grid(mouse_pos)
+    tile_idx = get_tile_idx(tile_pos)
+    if not tile_exists(tile_pos, tile_idx):
+        return
+
     TileMap.tile_map[tile_idx[1]][tile_idx[0]] = None
+    Tiles.total_tiles -= 1
 
 
 def export(tiles):
@@ -139,9 +273,11 @@ def map_setup() -> tuple:
 
     Label(root, text="Map maker setup").pack(pady=2)
 
-    width_spinbox = Spinbox(root, from_=20, to=500)
+    width_spinbox = Spinbox(
+        root, from_=round((SCREEN_SIZE[0] - SIDEBAR_SIZE[0]) / TILE_SIZE), to=500
+    )
     height_spinbox = Spinbox(
-        root, from_=10, to=10
+        root, from_=round(SCREEN_SIZE[1] // TILE_SIZE), to=500
     )  # TODO: scrolling vertically instead of fixed
 
     Label(root, text="Width").pack(pady=2)
@@ -164,27 +300,13 @@ def map_setup() -> tuple:
 ############
 def main():
     map_size = map_setup()
-    max_scroll_x = (map_size[0] * TILE_SIZE) - (SCREEN_SIZE[0] // TILE_SIZE) * TILE_SIZE
-    print(max_scroll_x)
+    max_scroll_x = (map_size[0] * TILE_SIZE) - (
+        (SCREEN_SIZE[0] - SIDEBAR_SIZE[0]) // TILE_SIZE
+    ) * TILE_SIZE
 
+    sidebar = Sidebar()
     TileMap.create_tile_2d_array(map_size)
 
-    texts = [
-        Text(
-            "Map Maker for Some Platformer Game",
-            size=12,
-            pos=(SCREEN_SIZE[0] // 2, 15),
-        ),
-        Text("Press H to toggle this text", size=12, pos=(SCREEN_SIZE[0] // 2, 30)),
-        Text("Press R to reset", size=12, pos=(SCREEN_SIZE[0] // 2, 45)),
-        Text("Press the arrow keys to scroll", size=12, pos=(SCREEN_SIZE[0] // 2, 60)),
-    ]
-    currently_scrolling_text = Text(
-        f"Currently scrolling {Scrolling.scroll_x // TILE_SIZE} times",
-        size=12,
-        pos=(SCREEN_SIZE[0] // 2, 75),
-    )
-    show_text = True
     while True:
         # Event handler
         for event in pygame.event.get():
@@ -195,13 +317,11 @@ def main():
 
             # Keypress
             if event.type == pygame.KEYUP:
-                # Toggle text
-                if event.key == pygame.K_h:
-                    show_text = not show_text
-
                 # Reset map
-                elif event.key == pygame.K_r:
+                if event.key == pygame.K_r:
                     TileMap.create_tile_2d_array(map_size)
+                    Tiles.total_tiles = 0
+                    sidebar.create_total_tiles_text()
 
                 # Scroll screen to the right
                 if event.key == pygame.K_RIGHT:
@@ -224,26 +344,24 @@ def main():
                 else:
                     break
 
-                # Update scrolled text
-                currently_scrolling_text = Text(
-                    f"Currently scrolling {Scrolling.scroll_x} pixels "
-                    + f"({Scrolling.scroll_x // TILE_SIZE} times out of "
-                    + f"{max_scroll_x // TILE_SIZE})",
-                    size=12,
-                    pos=(SCREEN_SIZE[0] // 2, 75),
-                )
+                # Update text
+                sidebar.create_scroll_text()
 
         # Mouse click
         if (buttons_pressed := pygame.mouse.get_pressed()) != (0, 0, 0):
             mouse_x, mouse_y = pygame.mouse.get_pos()
 
-            # Creating
-            if buttons_pressed[0]:
-                create_tile((mouse_x, mouse_y))
+            # Not on sidebar
+            if mouse_x > SIDEBAR_SIZE[0]:
+                # Creating
+                if buttons_pressed[0]:
+                    create_tile((mouse_x, mouse_y))
 
-            # Destroying
-            else:
-                destroy_tile((mouse_x, mouse_y))
+                # Destroying
+                else:
+                    destroy_tile((mouse_x, mouse_y))
+
+                sidebar.create_total_tiles_text()
 
         # Draw
         screen.fill("blue")
@@ -252,10 +370,7 @@ def main():
                 if tile is not None:
                     tile.draw()
 
-        if show_text:
-            for text in texts:
-                text.draw()
-            currently_scrolling_text.draw()
+        sidebar.draw()
 
         pygame.display.update()
         clock.tick(60)
