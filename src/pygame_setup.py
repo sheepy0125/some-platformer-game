@@ -8,6 +8,7 @@ import pygame
 from config_parser import FPS, GRAVITY, SCROLL_OFFSET
 
 SCREEN_SIZE = (500, 500)
+TARGET_FRAMERATE = 60
 screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Some Platformer Game")
 clock = pygame.time.Clock()

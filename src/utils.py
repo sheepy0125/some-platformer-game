@@ -5,6 +5,7 @@ Created by sheepy0125
 """
 
 from pathlib import Path
+from time import time
 
 ###############
 ### Globals ###
@@ -49,3 +50,18 @@ class Logger:
 class Scrolling:
     scroll_x: float = 0
     scroll_y: float = 0
+
+
+########################
+### Delta time class ###
+########################
+class DeltaTime:
+    now = time()
+    prev_now = time()
+    dt = 0
+
+    @staticmethod
+    def get_delta_time():
+        DeltaTime.prev_now = DeltaTime.now
+        DeltaTime.now = time()
+        DeltaTime.dt = DeltaTime.now - DeltaTime.prev_now

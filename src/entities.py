@@ -4,9 +4,9 @@ Created by duuuck and sheepy0125
 08/10/2021
 """
 
-from pygame_setup import pygame, screen, SCREEN_SIZE
+from pygame_setup import pygame, screen, clock, SCREEN_SIZE, TARGET_FRAMERATE
 from config_parser import FPS, GRAVITY, SCROLL_OFFSET
-from utils import Logger, Scrolling, ROOT_PATH
+from utils import Logger, Scrolling, DeltaTime, ROOT_PATH
 from world import World
 
 ##############
@@ -20,7 +20,7 @@ class Entity:
         self.image_path = image_path
 
         self.default_pos = list(default_pos)
-        self.velocity_cap = (20, 10)
+        self.velocity_cap = (20, 30)
         self.vx = self.vy = 0
 
         self.land_time = 0
@@ -55,10 +55,6 @@ class Entity:
         ]
 
     def move(self, world: World):
-
-        self.land_time += 1
-
-        # Horizontal
         self.collision_types = {
             "top": False,
             "bottom": False,
@@ -66,13 +62,7 @@ class Entity:
             "right": False,
         }
 
-        # Add velocity
-        if abs(self.vx > self.velocity_cap[0]):
-            self.vx = self.velocity_cap[0]
-
-        # Terminal velocity
-        # if abs(self.vy) < self.velocity_cap[1]:
-        # self.vy = self.velocity_cap[1]
+        # Horizontal
 
         # Set position
         self.rect.x += self.vx
@@ -100,9 +90,13 @@ class Entity:
 
         # Vertical
 
-        # Add velocity
-        self.vy += GRAVITY * 1.5
+        # Add gravity
+        self.vy += GRAVITY * 1.5 * DeltaTime.dt * TARGET_FRAMERATE
         self.rect.y += self.vy
+
+        # Terminal velocity
+        if self.vy > self.velocity_cap[1]:
+            self.vy = self.velocity_cap[1]
 
         # Check vertical collision
         collision_list = self.get_tile_collisions(
@@ -128,6 +122,7 @@ class Entity:
             self.vy = 0
 
         self.prev_on_ground = self.collision_types["bottom"]
+        self.land_time += 1
 
     def draw(self):
         # Squashing and stretching
@@ -183,15 +178,16 @@ class Player(Entity):
         if keys[pygame.K_UP] and (
             self.collision_types["bottom"] or self.air_time < self.air_time_grace_period
         ):
+            print("jumping lol", DeltaTime.dt)
             self.vy = -20
 
         # Right
         if keys[pygame.K_RIGHT]:
-            self.vx = 10
+            self.vx = 10 * DeltaTime.dt * TARGET_FRAMERATE
 
         # Left
         elif keys[pygame.K_LEFT]:
-            self.vx = -10
+            self.vx = -10 * DeltaTime.dt * TARGET_FRAMERATE
 
         # None
         else:
