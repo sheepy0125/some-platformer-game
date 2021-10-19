@@ -60,8 +60,8 @@ class Entity:
 
     def move(self,time_elapsed, world: World):
 
-        if time_elapsed > .1:
-            time_elapsed = .1
+        if time_elapsed > 1:
+            time_elapsed = 1
 
         # Horizontal
         self.collision_types = {

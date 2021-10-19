@@ -45,7 +45,8 @@ while True:
     Scrolling.scroll_y += (player.rect.centery - Scrolling.scroll_y - 300) / 10 * (time_elapsed * 60)
         # Draw
 
-    clock.tick(FPS)
+    print(player.vy)
+
     screen.fill("blue")
     world.draw_tiles()
     player.draw()
