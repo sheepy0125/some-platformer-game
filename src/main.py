@@ -19,7 +19,7 @@ from time import time
 # Create entities
 player = Player()
 entities: list[Entity] = []
-frame = 0
+frame = time()
 
 # Create world
 world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
@@ -41,15 +41,14 @@ while True:
     # Scroll world
     Scrolling.scroll_x += (
         player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET
-    ) / 10
-    Scrolling.scroll_y += (player.rect.centery - Scrolling.scroll_y - 300) / 10
+    ) / 10 * (60 * time_elapsed)
+    Scrolling.scroll_y += (player.rect.centery - Scrolling.scroll_y - 300) / 10 * (time_elapsed * 60)
+        # Draw
 
-    # Draw
+    clock.tick(FPS)
     screen.fill("blue")
     world.draw_tiles()
     player.draw()
     pygame.display.update()
-
-    clock.tick(FPS * 1000)
 
 Logger.warn("You're not supposed to see this (exited out of main loop)")

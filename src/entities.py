@@ -59,7 +59,9 @@ class Entity:
         ]
 
     def move(self,time_elapsed, world: World):
-        time_dif = frame - time()
+
+        if time_elapsed > .1:
+            time_elapsed = .1
 
         # Horizontal
         self.collision_types = {
@@ -78,7 +80,7 @@ class Entity:
         # self.vy = self.velocity_cap[1]
 
         # Set position
-        self.rect.x += round(self.vx * time_elapsed * 60)
+        self.rect.x += round(self.vx * time_elapsed * FPS)
 
         # Check horizontal collision
         collision_list = self.get_tile_collisions(
@@ -102,8 +104,9 @@ class Entity:
         # Vertical
 
         # Add velocity
-        self.vy += GRAVITY
-        self.rect.y += self.vy
+        self.vy += GRAVITY * 60 * time_elapsed
+        self.rect.y += round(self.vy * 60 * time_elapsed)
+
 
         # Check vertical collision
         collision_list = self.get_tile_collisions(
@@ -163,7 +166,7 @@ class Player(Entity):
         )
 
         self.air_time = 0
-        self.air_time_grace_period = 5
+        self.air_time_grace_period = .1
 
         Logger.log("Created player")
 
@@ -180,7 +183,7 @@ class Player(Entity):
             # Possible to jump
             if (
                 self.collision_types["bottom"]
-                or self.air_time < self.air_time_grace_period/60
+                or time() - self.air_time < self.air_time_grace_period
             ):
                 self.vy = -20
 
