@@ -9,6 +9,12 @@ from config_parser import FPS, GRAVITY, SCROLL_OFFSET
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World
 
+from time import time
+
+
+
+
+
 ##############
 ### Entity ###
 ##############
@@ -23,7 +29,7 @@ class Entity:
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
 
-        self.land_time = 0
+        self.land_time = time()
 
         self.collision_types = {
             "top": False,
@@ -56,7 +62,6 @@ class Entity:
 
     def move(self, world: World):
 
-        self.land_time += 1
 
         # Horizontal
         self.collision_types = {
@@ -119,7 +124,7 @@ class Entity:
                 self.rect.bottom = tile.top
                 self.collision_types["bottom"] = True
                 if not self.prev_on_ground:
-                    self.land_time = 0
+                    self.land_time = time()
 
             else:
                 break
@@ -142,7 +147,7 @@ class Entity:
             draw_y -= 3
 
         # Squashing
-        elif self.land_time < 6:
+        elif time() - self.land_time < .1:
             surface = self.land_surf
             draw_x -= 5
             draw_y += 10
@@ -157,6 +162,7 @@ class Entity:
 ##############
 ### Player ###
 ##############
+
 class Player(Entity):
     def __init__(self):
         super().__init__(
