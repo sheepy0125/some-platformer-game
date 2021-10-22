@@ -18,7 +18,6 @@ class Entity:
     def __init__(self, size: tuple, image_path: str, default_pos: list):
         self.size = size
         self.image_path = image_path
-
         self.default_pos = list(default_pos)
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
@@ -165,10 +164,20 @@ class Player(Entity):
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
 
+        self.target_speed = 0
         self.air_time = 0
         self.air_time_grace_period = 5
 
         Logger.log("Created player")
+
+    def move(self, world: World):
+        speed_dif = self.target_speed - self.vx
+
+        self.vx += speed_dif / 5
+
+        super().move(world)
+
+
 
     def event_handler(self):
         keys: dict = pygame.key.get_pressed()
@@ -187,15 +196,16 @@ class Player(Entity):
 
         # Right
         if keys[pygame.K_RIGHT]:
-            self.vx = 10
+            self.target_speed = 10
 
         # Left
         elif keys[pygame.K_LEFT]:
-            self.vx = -10
+            self.target_speed = -10
+
+        else:
+            self.target_speed = 0
 
         # None
-        else:
-            self.vx = 0
 
         # Other keys
 
