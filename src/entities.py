@@ -9,6 +9,9 @@ from config_parser import FPS, GRAVITY, SCROLL_OFFSET
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World
 
+from time import time
+
+
 ##############
 ### Entity ###
 ##############
@@ -22,7 +25,7 @@ class Entity:
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
 
-        self.land_time = 0
+        self.land_time = time()
 
         self.collision_types = {
             "top": False,
@@ -54,8 +57,6 @@ class Entity:
         ]
 
     def move(self, world: World):
-
-        self.land_time += 1
 
         # Horizontal
         self.collision_types = {
@@ -118,7 +119,7 @@ class Entity:
                 self.rect.bottom = tile.top
                 self.collision_types["bottom"] = True
                 if not self.prev_on_ground:
-                    self.land_time = 0
+                    self.land_time = time()
 
             else:
                 break
@@ -141,7 +142,7 @@ class Entity:
             draw_y -= 3
 
         # Squashing
-        elif self.land_time < 6:
+        elif time() - self.land_time < .1:
             surface = self.land_surf
             draw_x -= 5
             draw_y += 10
@@ -164,8 +165,8 @@ class Player(Entity):
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
         self.target_speed = 0
-        self.air_time = 0
-        self.air_time_grace_period = 5
+        self.air_time = time()
+        self.air_time_grace_period = 5/60
 
         Logger.log("Created player")
 
@@ -186,13 +187,11 @@ class Player(Entity):
 
         # Air time check (allowed to jump a bit after losing contact with ground)
         if self.collision_types["bottom"]:
-            self.air_time = 0
-        else:
-            self.air_time += 1
+            self.air_time = time()
 
         # Jump
         if keys[pygame.K_UP] and (
-            self.collision_types["bottom"] or self.air_time < self.air_time_grace_period
+            self.collision_types["bottom"] or time() - self.air_time < self.air_time_grace_period
         ):
             self.vy = -20
 

@@ -34,7 +34,6 @@ while True:
     player.event_handler()
     player.move(world=world)
 
-    print(player.vx)
 
     # Scroll world
     Scrolling.scroll_x += (
