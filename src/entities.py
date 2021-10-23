@@ -174,7 +174,7 @@ class Player(Entity):
         speed_dif = self.target_speed - self.vx
 
         if self.target_speed == 0:
-            self.vx += speed_dif / 5
+            self.vx += speed_dif / 6
         else:
             self.vx += speed_dif / 10
 

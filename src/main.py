@@ -3,17 +3,17 @@ Some Platformer Game
 Created by duuuck and sheepy0125
 08/10/2021
 """
-
 #############
 ### Setup ###
 #############
 # Import
-from pygame_setup import pygame, screen, clock, SCREEN_SIZE
+
+
+from pygame_setup import pygame, screen, clock
 from config_parser import SCROLL_OFFSET, FPS
 from entities import Player, Entity
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World, load_world
-from sys import exit
 
 # Create entities
 player = Player()
@@ -33,7 +33,6 @@ while True:
 
     player.event_handler()
     player.move(world=world)
-
 
     # Scroll world
     Scrolling.scroll_x += (
