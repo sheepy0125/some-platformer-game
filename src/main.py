@@ -8,7 +8,6 @@ Created by duuuck and sheepy0125
 #############
 # Import
 
-
 from pygame_setup import pygame, screen, clock
 from config_parser import SCROLL_OFFSET, FPS
 from entities import Player, Entity
