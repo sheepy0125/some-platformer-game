@@ -42,6 +42,33 @@ class TileMap:
     tile_map = []
 
     @staticmethod
+    def convert_array_to_string() -> str:
+        """Converts the tile map array into a string for saving and debug prints"""
+
+        map_str = ""
+
+        for row in TileMap.tile_map:
+            for tile in row:
+                if tile is None:
+                    map_str += "0"
+                else:
+                    map_str += str(tile.id)
+            map_str += "\n"
+
+        return map_str
+
+    @staticmethod
+    def debug_print() -> None:
+        """Prints the tile map array for debug purposes"""
+
+        Logger.log("Debugging print the tile map")
+
+        for row_idx, row in enumerate(
+            TileMap.convert_array_to_string().split("\n")[:-1]
+        ):
+            Logger.log(f"Row {row_idx:3d}: {row}")
+
+    @staticmethod
     def create_tile_2d_array(map_size: tuple) -> list[list]:
         tile_map = []
         # Rows
@@ -325,6 +352,10 @@ def main():
                     TileMap.create_tile_2d_array(map_size)
                     Tiles.total_tiles = 0
                     sidebar.create_total_tiles_text()
+
+                # Debug print
+                elif event.key == pygame.K_p:
+                    TileMap.debug_print()
 
                 # Scroll screen to the right
                 if event.key == pygame.K_RIGHT:
