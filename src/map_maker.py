@@ -42,6 +42,17 @@ class TileMap:
     tile_map = []
 
     @staticmethod
+    def create_tile_2d_array(map_size: tuple) -> list[list]:
+        tile_map = []
+        # Rows
+        for _ in range(map_size[1]):
+            # Create list of zeros
+            tile_map.append([None for _ in range(map_size[0])])
+
+        TileMap.tile_map = tile_map
+        Logger.log("Created tile map")
+
+    @staticmethod
     def convert_array_to_string() -> str:
         """Converts the tile map array into a string for saving and debug prints"""
 
@@ -67,17 +78,6 @@ class TileMap:
             TileMap.convert_array_to_string().split("\n")[:-1]
         ):
             Logger.log(f"Row {row_idx:3d}: {row}")
-
-    @staticmethod
-    def create_tile_2d_array(map_size: tuple) -> list[list]:
-        tile_map = []
-        # Rows
-        for _ in range(map_size[1]):
-            # Create list of zeros
-            tile_map.append([None for _ in range(map_size[0])])
-
-        TileMap.tile_map = tile_map
-        Logger.log("Created tile map")
 
 
 class Sidebar:
@@ -243,20 +243,10 @@ def destroy_tile(mouse_pos):
     Tiles.total_tiles -= 1
 
 
-def export(tiles):
-    # Map string
-    export_text = ""
-    for tile_row in TileMap.tile_map:
-        for tile in tile_row:
-            # Tile doesn't exist (air)
-            if tile is None:
-                export_text += "0"
-                continue
+def export():
+    """Save tile to a file"""
 
-            # Use tile ID
-            export_text += str(tile.id)
-
-        export_text += "\n"
+    map_string = TileMap.convert_array_to_string()
 
     # Get filepath to export to
     map_file = filedialog.asksaveasfile()
@@ -264,7 +254,7 @@ def export(tiles):
 
     with map_file:
         map_file.truncate(0)
-        map_file.write(export_text)
+        map_file.write(map_string)
 
     Logger.log("Successfully exported map")
 
