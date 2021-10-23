@@ -166,7 +166,7 @@ class Player(Entity):
         )
         self.target_speed = 0
         self.air_time = time()
-        self.air_time_grace_period = 5/60
+        self.air_time_grace_period = 1/15
 
         Logger.log("Created player")
 
@@ -190,17 +190,17 @@ class Player(Entity):
             self.air_time = time()
 
         # Jump
-        if keys[pygame.K_UP] and (
+        if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and (
             self.collision_types["bottom"] or time() - self.air_time < self.air_time_grace_period
         ):
             self.vy = -20
 
         # Right
-        if keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.target_speed = 10
 
         # Left
-        elif keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.target_speed = -10
 
         else:
