@@ -74,7 +74,7 @@ class Entity:
         # self.vy = self.velocity_cap[1]
 
         # Set position
-        self.rect.x += self.vx
+        self.rect.x += round(self.vx)
 
         # Check horizontal collision
         collision_list = self.get_tile_collisions(
@@ -163,7 +163,6 @@ class Player(Entity):
             image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
             default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
         )
-
         self.target_speed = 0
         self.air_time = 0
         self.air_time_grace_period = 5
@@ -173,7 +172,10 @@ class Player(Entity):
     def move(self, world: World):
         speed_dif = self.target_speed - self.vx
 
-        self.vx += speed_dif / 5
+        if self.target_speed == 0:
+            self.vx += speed_dif / 5
+        else:
+            self.vx += speed_dif / 10
 
         super().move(world)
 

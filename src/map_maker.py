@@ -250,7 +250,7 @@ class MapSize:
 
 
 def map_setup() -> tuple:
-    def save_variables() -> bool | int:
+    def save_variables() -> int:
         try:
             assert (
                 width := width_spinbox.get()

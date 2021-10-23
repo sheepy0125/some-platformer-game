@@ -34,6 +34,8 @@ while True:
     player.event_handler()
     player.move(world=world)
 
+    print(player.vx)
+
     # Scroll world
     Scrolling.scroll_x += (
         player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET
