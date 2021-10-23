@@ -34,10 +34,7 @@ while True:
     player.event_handler()
     player.move(world=world)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 842c489ae2daf1f8c6f76381f8277debc5652e46
     # Scroll world
     Scrolling.scroll_x += (
         player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET
