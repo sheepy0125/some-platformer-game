@@ -6,7 +6,6 @@ Created by duuuck and sheepy0125
 #############
 ### Setup ###
 #############
-# Import
 
 from pygame_setup import pygame, screen, clock
 from config_parser import SCROLL_OFFSET, FPS
