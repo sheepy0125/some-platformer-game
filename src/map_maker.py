@@ -378,7 +378,7 @@ def main():
 
                 elif event.key == pygame.K_e:
                     try:
-                        export(TileMap.tile_map)
+                        export()
                     except Exception as error:
                         Logger.fatal("Failed to export map")
                         Logger.log_error(error)
