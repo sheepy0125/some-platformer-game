@@ -4,3 +4,4 @@ good version coming soon
 0 = sky
 
 60x10 dimensions
+no 60 x 10 bad
