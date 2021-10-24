@@ -166,7 +166,7 @@ class Player(Entity):
         )
         self.target_speed = 0
         self.air_time = time()
-        self.air_time_grace_period = 1/15
+        self.air_time_grace_period = .05
 
         Logger.log("Created player")
 

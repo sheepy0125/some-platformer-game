@@ -5,7 +5,7 @@ Created by duuuck and sheepy0125
 """
 #############
 ### Setup ###
-#############
+#############   
 
 from pygame_setup import pygame, screen, clock
 from config_parser import SCROLL_OFFSET, FPS
@@ -18,7 +18,7 @@ player = Player()
 entities: list[Entity] = []
 
 # Create world
-world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
+world = World(load_world(str(ROOT_PATH / "src" / "maps" / "d.map")))
 
 while True:
     # Event handling
