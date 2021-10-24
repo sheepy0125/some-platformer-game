@@ -51,7 +51,11 @@ class World:
 
                 # Player tile
                 if tile == 9:
-                    self.player_pos = tile_position
+                    # Convert top left of tile posititon to center
+                    self.player_pos = (
+                        tile_position[0] + TILE_SIZE // 2,
+                        tile_position[1] + TILE_SIZE // 2,
+                    )
 
                 # TODO: more tiles
 
