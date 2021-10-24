@@ -18,7 +18,7 @@ from time import time
 class Entity:
     """Base entity class"""
 
-    def __init__(self, size: tuple, image_path: str, default_pos: list):
+    def __init__(self, size: tuple, image_path: str, default_pos: tuple):
         self.size = size
         self.image_path = image_path
         self.default_pos = list(default_pos)
@@ -142,7 +142,7 @@ class Entity:
             draw_y -= 3
 
         # Squashing
-        elif time() - self.land_time < .1:
+        elif time() - self.land_time < 0.1:
             surface = self.land_surf
             draw_x -= 5
             draw_y += 10
@@ -158,15 +158,15 @@ class Entity:
 ### Player ###
 ##############
 class Player(Entity):
-    def __init__(self,pos):
+    def __init__(self, pos):
         super().__init__(
             size=(30, 50),
-            image_path = str(ROOT_PATH / "assets" / "images" / "player.png"),
-            default_pos = pos,
+            image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
+            default_pos=pos,
         )
         self.target_speed = 0
         self.air_time = time()
-        self.air_time_grace_period = 1/15
+        self.air_time_grace_period = 1 / 15
 
         Logger.log("Created player")
 
@@ -180,8 +180,6 @@ class Player(Entity):
 
         super().move(world)
 
-
-
     def event_handler(self):
         keys: dict = pygame.key.get_pressed()
 
@@ -191,7 +189,8 @@ class Player(Entity):
 
         # Jump
         if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and (
-            self.collision_types["bottom"] or time() - self.air_time < self.air_time_grace_period
+            self.collision_types["bottom"]
+            or time() - self.air_time < self.air_time_grace_period
         ):
             self.vy = -20
 
