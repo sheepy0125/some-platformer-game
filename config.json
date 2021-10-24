@@ -1,5 +1,4 @@
 {
-    "fps": 60,
-    "gravity": 1,
-    "scrollOffset": 250
+	"fps": 60,
+	"gravity": 1
 }

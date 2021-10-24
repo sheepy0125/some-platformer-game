@@ -8,11 +8,8 @@ Source: https://youtu.be/abH2MSBdnWc
 from pygame_setup import pygame, screen, SCREEN_SIZE
 from utils import Logger, Scrolling, ROOT_PATH
 
-# Scale tile size to have height fill all the way
-# For now, we can agree that the height of the maps will be 10
 MAP_HEIGHT = 10
-TILE_SIZE = round(SCREEN_SIZE[1] / MAP_HEIGHT)
-
+TILE_SIZE = 50
 ###################
 ### World class ###
 ###################
@@ -54,7 +51,11 @@ class World:
 
                 # Player tile
                 if tile == 9:
-                    self.player_pos = tile_position
+                    # Convert top left of tile posititon to center
+                    self.player_pos = (
+                        tile_position[0] + TILE_SIZE // 2,
+                        tile_position[1] + TILE_SIZE // 2,
+                    )
 
                 # TODO: more tiles
 
