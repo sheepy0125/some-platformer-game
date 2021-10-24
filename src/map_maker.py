@@ -322,7 +322,6 @@ def main():
     ) * TILE_SIZE
     max_scroll_y = -(map_size[1] * TILE_SIZE)
 
-    print(max_scroll_y)
 
     sidebar = Sidebar()
     TileMap.create_tile_2d_array(map_size)
