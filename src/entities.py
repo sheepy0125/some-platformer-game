@@ -158,11 +158,11 @@ class Entity:
 ### Player ###
 ##############
 class Player(Entity):
-    def __init__(self):
+    def __init__(self,pos):
         super().__init__(
             size=(30, 50),
-            image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
-            default_pos=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2),
+            image_path = str(ROOT_PATH / "assets" / "images" / "player.png"),
+            default_pos = pos,
         )
         self.target_speed = 0
         self.air_time = time()

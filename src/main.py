@@ -13,12 +13,13 @@ from entities import Player, Entity
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World, load_world
 
-# Create entities
-player = Player()
-entities: list[Entity] = []
-
 # Create world
 world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
+
+# Create entities
+player = Player(world.player_pos)
+entities: list[Entity] = []
+
 
 while True:
     # Event handling
