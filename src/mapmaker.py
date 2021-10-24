@@ -25,6 +25,9 @@ def snap_to_grid(mouse_pos: tuple) -> tuple:
 
     return tuple([(int((mouse_pos[i] + offset[i]) / TILE_SIZE) * TILE_SIZE) for i in range(2)])
 
+def 
+
+
 def export():
 	tile_map = {}
 
@@ -41,7 +44,7 @@ def export():
 		max_pos[1] = max(tile[1],max_pos[1])
 		tile = tuple(tile)
 		tile_map[tile] = game_map[grid]
-
+	
 	grid_size = [max_pos[0] - min_pos[0] + 1,max_pos[1] - min_pos[1] + 1]
 
 	tile_map1 = {}
