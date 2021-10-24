@@ -403,8 +403,12 @@ def main():
             if event.type == pygame.KEYUP:
                 # Reset map
                 if event.key == pygame.K_r:
+                    # Reset tile map
                     TileMap.create_tile_2d_array(map_size)
                     Tiles.total_tiles = 0
+                    for tile_id in Tiles.tile_dict:
+                        Tiles.tile_dict[tile_id]["amount"] = 0
+                    # Reset sidebar
                     sidebar.create_total_tiles_text()
 
                 # Debug print

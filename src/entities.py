@@ -205,8 +205,6 @@ class Player(Entity):
         else:
             self.target_speed = 0
 
-        # None
-
         # Other keys
 
         # Reset
