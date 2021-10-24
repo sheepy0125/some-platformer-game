@@ -11,7 +11,9 @@ from utils import Logger, Scrolling, ROOT_PATH
 MAP_HEIGHT = 10
 TILE_SIZE = 50
 
-
+#######################
+### Tiles dataclass ###
+#######################
 class Tiles:
     """Dataclass for tiles"""
 
