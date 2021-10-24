@@ -205,11 +205,19 @@ def get_tile_idx(tile_location: tuple) -> tuple:
     second index being the column index (it's a 2D map)
     """
 
-    return (
+    tile_idx = (
         ((tile_location[0] + Scrolling.scroll_x) // TILE_SIZE)
         - SIDEBAR_SIZE[0] // TILE_SIZE,
         (tile_location[1] + Scrolling.scroll_y) // TILE_SIZE,
     )
+
+    # Assert tile is in bounds
+    if ((tile_idx[0] < 0) or (tile_idx[0] >= MapSize.size[0])) or (
+        (tile_idx[1] < 0) or (tile_idx[1] >= MapSize.size[1])
+    ):
+        Logger.fatal(f"Tile is out of bounds ({tile_idx})!")
+
+    return tile_idx
 
 
 def tile_exists(tile_pos: tuple, tile_idx: tuple):
@@ -320,7 +328,8 @@ def main():
     max_scroll_x = (map_size[0] * TILE_SIZE) - (
         (SCREEN_SIZE[0] - SIDEBAR_SIZE[0]) // TILE_SIZE
     ) * TILE_SIZE
-    max_scroll_y = -(map_size[1] * TILE_SIZE)
+    max_scroll_y = (map_size[1] * TILE_SIZE) - (SCREEN_SIZE[1])
+    Scrolling.scroll_y = max_scroll_y
 
     print(max_scroll_y)
 
@@ -359,12 +368,12 @@ def main():
 
                 # Scroll screen up
                 elif event.key == pygame.K_UP:
-                    if Scrolling.scroll_y > max_scroll_y:
+                    if Scrolling.scroll_y > 0:
                         Scrolling.scroll_y -= TILE_SIZE
 
                 # Scroll screen down
                 elif event.key == pygame.K_DOWN:
-                    if Scrolling.scroll_y != 0:
+                    if Scrolling.scroll_y < max_scroll_y:
                         Scrolling.scroll_y += TILE_SIZE
 
                 elif event.key == pygame.K_e:
