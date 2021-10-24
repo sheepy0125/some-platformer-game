@@ -29,13 +29,52 @@ pygame.display.set_caption("Map maker for Some Platformer Game")
 ###############
 class Tiles:
     tile_dict = {
+        # For max_amount, -1 is infinite
         "1": {
             "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
             "name": "dirt",
-        }
+            "max_amount": -1,
+        },
+        "9": {
+            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "player.png"),
+            "name": "player",
+            "max_amount": 1,
+        },
     }
     current_tile = 1
+    # Set amount of tiles
     total_tiles = 0
+    for tile_id in tile_dict.keys():
+        tile_dict[tile_id]["amount"] = 0
+
+    # Change tile
+    @staticmethod
+    def change_tile(next_tile: bool):
+        """
+        Changes to a new tile
+        next_tile: Tells whether we are switching forwards or backwards
+        """
+
+        # Get the new tile ID from the dictionary keys
+        # We need to do this because tile indeces are not (always) sequential
+        tile_keys = list(Tiles.tile_dict.keys())
+        current_tile_index = tile_keys.index(str(Tiles.current_tile))
+        # Find the index of the new tile
+        if next_tile:
+            new_tile_index = current_tile_index + 1
+            # Out of bounds check
+            if new_tile_index >= len(tile_keys):
+                new_tile_index = 0
+        else:
+            new_tile_index = current_tile_index - 1
+            # Out of bounds check
+            if new_tile_index < 0:
+                new_tile_index = len(tile_keys) - 1
+
+        # Get the new tile tile ID
+        new_tile_id = tile_keys[new_tile_index]
+
+        Tiles.current_tile = new_tile_id
 
 
 class TileMap:
@@ -108,9 +147,14 @@ class Sidebar:
                 pos=(SIDEBAR_SIZE[0] // 2, 60),
             ),
             Text(
-                "Press E to Export",
+                "Press E to export",
                 size=12,
                 pos=(SIDEBAR_SIZE[0] // 2, 75),
+            ),
+            Text(
+                "Press P to debug print the map",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 90),
             ),
             Text(
                 "Press N to switch to the next block",
@@ -118,7 +162,7 @@ class Sidebar:
                 pos=(SIDEBAR_SIZE[0] // 2, 105),
             ),
             Text(
-                "Press P to switch to the prev block",
+                "Press B to switch to the prev block",
                 size=12,
                 pos=(SIDEBAR_SIZE[0] // 2, 120),
             ),
@@ -139,11 +183,11 @@ class Sidebar:
 
         # Available tile texts
         self.available_tile_texts = []
-        for tile_idx, available_tile in enumerate(Tiles.tile_dict.values()):
-            print(tile_idx, available_tile)
+        for tile_idx, (tile_id, available_tile) in enumerate(Tiles.tile_dict.items()):
+            # Please note: tile_id is a string, not an int
             self.available_tile_texts.append(
                 Text(
-                    f"Tile {tile_idx + 1}: {available_tile['name']}",
+                    f"Tile {tile_id}: {available_tile['name']}",
                     size=12,
                     pos=(SIDEBAR_SIZE[0] // 2, (225 + 128 + (15 * tile_idx))),
                 )
@@ -220,35 +264,51 @@ def get_tile_idx(tile_location: tuple) -> tuple:
     return tile_idx
 
 
-def tile_exists(tile_pos: tuple, tile_idx: tuple):
+def tile_exists(tile_idx: tuple):
     return TileMap.tile_map[tile_idx[1]][tile_idx[0]] is not None
 
 
 def create_tile(mouse_pos):
     tile_pos = snap_to_grid(mouse_pos)
     tile_idx = get_tile_idx(tile_pos)
-    if tile_exists(tile_pos, tile_idx):
+    if tile_exists(tile_idx):
         return
+
+    # Don't allow creation of tile if the max number of tiles has been reached for that tile
+    if (
+        max_num_of_tiles := Tiles.tile_dict[str(Tiles.current_tile)]["max_amount"]
+    ) != -1:
+        if max_num_of_tiles <= Tiles.tile_dict[str(Tiles.current_tile)]["amount"]:
+            Logger.warn(f"Can't create more than {max_num_of_tiles} of this tile!")
+            return
+
+    # Get tile filepath and ID
+    tile_id = Tiles.current_tile
+    tile_image_filepath = Tiles.tile_dict[str(tile_id)]["filepath"]
 
     TileMap.tile_map[tile_idx[1]][tile_idx[0]] = Tile(
         (
             tile_pos[0] + Scrolling.scroll_x,
             tile_pos[1] + Scrolling.scroll_y,
         ),
-        image_path=str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
-        id=1,
+        image_path=tile_image_filepath,
+        id=tile_id,
     )
     Tiles.total_tiles += 1
+    Tiles.tile_dict[str(tile_id)]["amount"] += 1
 
 
 def destroy_tile(mouse_pos):
     tile_pos = snap_to_grid(mouse_pos)
     tile_idx = get_tile_idx(tile_pos)
-    if not tile_exists(tile_pos, tile_idx):
+    if not tile_exists(tile_idx):
         return
 
+    tile_id = TileMap.tile_map[tile_idx[1]][tile_idx[0]].id
     TileMap.tile_map[tile_idx[1]][tile_idx[0]] = None
+
     Tiles.total_tiles -= 1
+    Tiles.tile_dict[str(tile_id)]["amount"] -= 1
 
 
 def export():
@@ -331,8 +391,6 @@ def main():
     max_scroll_y = (map_size[1] * TILE_SIZE) - (SCREEN_SIZE[1])
     Scrolling.scroll_y = max_scroll_y
 
-    print(max_scroll_y)
-
     sidebar = Sidebar()
     TileMap.create_tile_2d_array(map_size)
 
@@ -356,6 +414,34 @@ def main():
                 elif event.key == pygame.K_p:
                     TileMap.debug_print()
 
+                # Export
+                elif event.key == pygame.K_e:
+                    try:
+                        export()
+                    except Exception as error:
+                        Logger.fatal("Failed to export map")
+                        Logger.log_error(error)
+
+                # Tile switching
+                while True:
+                    # Switch to next block
+                    if event.key == pygame.K_n:
+                        Tiles.change_tile(True)
+                    # Switch to previous block
+                    elif event.key == pygame.K_b:
+                        Tiles.change_tile(False)
+
+                    # Didn't switch tile
+                    else:
+                        break
+
+                    # Switched block, recreate for sidebar
+                    sidebar.create_current_tile_widgets()
+                    sidebar.create_total_tiles_text()
+                    break
+
+                # Scrolling
+
                 # Scroll screen to the right
                 if event.key == pygame.K_RIGHT:
                     if Scrolling.scroll_x < max_scroll_x:
@@ -375,13 +461,6 @@ def main():
                 elif event.key == pygame.K_DOWN:
                     if Scrolling.scroll_y < max_scroll_y:
                         Scrolling.scroll_y += TILE_SIZE
-
-                elif event.key == pygame.K_e:
-                    try:
-                        export()
-                    except Exception as error:
-                        Logger.fatal("Failed to export map")
-                        Logger.log_error(error)
 
                 # Not scrolling
                 else:
