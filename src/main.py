@@ -1,6 +1,6 @@
 """
 Some Platformer Game
-Created by duuuck and sheepy0125
+Created by duuuuck and sheepy0125
 08/10/2021
 """
 #############

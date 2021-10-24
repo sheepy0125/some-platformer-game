@@ -1,7 +1,7 @@
 """
 Map Maker for Some Platformer Game
-Created by duuuck and sheepy0125
-09/10/2012
+Created by duuuuck and sheepy0125
+09/10/2021
 """
 
 #############
@@ -262,7 +262,7 @@ def get_tile_idx(tile_location: tuple) -> tuple:
 
 
 def tile_exists(tile_idx: tuple):
-    
+
     return TileMap.tile_map[tile_idx[1]][tile_idx[0]] is not None
 
 
