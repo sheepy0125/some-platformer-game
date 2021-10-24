@@ -10,6 +10,26 @@ from utils import Logger, Scrolling, ROOT_PATH
 
 MAP_HEIGHT = 10
 TILE_SIZE = 50
+
+
+class Tiles:
+    """Dataclass for tiles"""
+
+    tile_dict = {
+        # For max_amount, -1 is infinite
+        "1": {
+            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
+            "name": "dirt",
+            "max_amount": -1,
+        },
+        "9": {
+            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "player.png"),
+            "name": "player",
+            "max_amount": 1,
+        },
+    }
+
+
 ###################
 ### World class ###
 ###################
@@ -37,15 +57,13 @@ class World:
                 # Positions are bound to top left
                 tile_position = (tile_idx * TILE_SIZE, row_idx * TILE_SIZE)
 
-                # Dirt
-                if tile == 1:
+                # Normal tiles (1-8)
+                if tile < 8:
                     self.tile_map.append(
                         Tile(
                             pos=tile_position,
-                            image_path=str(
-                                ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png",
-                            ),
-                            id=1,
+                            image_path=Tiles.tile_dict[str(tile)]["filepath"],
+                            id=tile,
                         )
                     )
 
@@ -57,7 +75,7 @@ class World:
                         tile_position[1] + TILE_SIZE // 2,
                     )
 
-                # TODO: more tiles
+                # TODO: more normal tiles
 
         if self.player_pos is None:
             Logger.warn("No player tile set, using default position")
