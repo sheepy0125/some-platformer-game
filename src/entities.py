@@ -4,8 +4,8 @@ Created by duuuck and sheepy0125
 08/10/2021
 """
 
-from pygame_setup import pygame, screen, SCREEN_SIZE
-from config_parser import FPS, GRAVITY, SCROLL_OFFSET
+from pygame_setup import pygame, screen, SCREEN_SIZE, SCROLL_OFFSET
+from config_parser import FPS, GRAVITY
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World
 

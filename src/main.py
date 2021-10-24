@@ -7,8 +7,8 @@ Created by duuuck and sheepy0125
 ### Setup ###
 #############
 
-from pygame_setup import pygame, screen, clock
-from config_parser import SCROLL_OFFSET, FPS
+from pygame_setup import pygame, screen, clock, SCROLL_OFFSET
+from config_parser import FPS
 from entities import Player, Entity
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World, load_world
@@ -35,9 +35,11 @@ while True:
 
     # Scroll world
     Scrolling.scroll_x += (
-        player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET
+        player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET[0]
     ) / 10
-    Scrolling.scroll_y += (player.rect.centery - Scrolling.scroll_y - 300) / 10
+    Scrolling.scroll_y += (
+        player.rect.centery - Scrolling.scroll_y - SCROLL_OFFSET[1]
+    ) / 10
 
     # Draw
     screen.fill("blue")
