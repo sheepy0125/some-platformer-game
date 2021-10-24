@@ -262,6 +262,7 @@ def get_tile_idx(tile_location: tuple) -> tuple:
 
 
 def tile_exists(tile_idx: tuple):
+    
     return TileMap.tile_map[tile_idx[1]][tile_idx[0]] is not None
 
 
@@ -312,8 +313,8 @@ def export():
     """Save tile to a file"""
 
     map_string = TileMap.convert_array_to_string()
-
     # Get filepath to export to
+    Tk().withdraw()
     map_file = filedialog.asksaveasfile()
     Logger.log(f"Exporting map to {map_file.name}")
 
