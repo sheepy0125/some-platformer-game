@@ -6,7 +6,7 @@ from utils import Logger,ROOT_PATH
 
 from tkinter import filedialog,Tk
 
-# root = Tk()
+root = Tk()
 
 clock = pygame.time.Clock()
 
@@ -33,8 +33,9 @@ def export():
 	for tile in game_map:
 		grid = tile
 		tile = list(tile)
-		tile[0] = tile[1] // TILE_SIZE
-		tile[1] = tile[0] // TILE_SIZE
+		tile[0] = tile[0] // TILE_SIZE
+		tile[1] = tile[1] // TILE_SIZE
+		tile[0],tile[1] = tile[1],tile[0]
 		min_pos[0] = min(tile[0],min_pos[0])
 		min_pos[1] = min(tile[1],min_pos[1])
 		max_pos[0] = max(tile[0],max_pos[0])
@@ -76,15 +77,13 @@ def export():
 		for j in range(len(new_grid[0])):
 			grid += str(new_grid[i][j])
 		grid += '\n'
-	Tk().withdraw()
+	root.withdraw()
 	map_file = filedialog.asksaveasfile(initialdir="C:\\Users\\ryden\\some-platformer-game\\src\\maps",
 										defaultextension='.map',
 										filetypes = [
 										('MAP file', '.map'),
 										('All files', '.*')
 										])
-	if map_file == None:
-		return
 	map_file.write(grid)
 	map_file.close()
 	
@@ -106,21 +105,19 @@ while True:
 	if pygame.mouse.get_pressed()[0]:
 		game_map[snap_to_grid(pygame.mouse.get_pos())] = tile_mode
 
-
-
 	if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-		offset[0] += 5
-	if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
 		offset[0] -= 5
+	if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+		offset[0] += 5
 	if keys[pygame.K_UP] or keys[pygame.K_w]:
-		offset[1] += 5
-	if keys[pygame.K_DOWN] or keys[pygame.K_s]:
 		offset[1] -= 5
+	if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+		offset[1] += 5
 
 	for key in game_map:
 		key = list(key)
-		key[0] += offset[0]
-		key[1] += offset[1]
+		key[0] -= offset[0]
+		key[1] -= offset[1]
 		screen.blit(dirt,key)
 
 	pygame.display.update()

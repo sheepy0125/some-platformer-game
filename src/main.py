@@ -18,7 +18,7 @@ player = Player()
 entities: list[Entity] = []
 
 # Create world
-world = World(load_world(str(ROOT_PATH / "src" / "maps" / "d.map")))
+world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
 
 while True:
     # Event handling
