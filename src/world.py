@@ -22,6 +22,7 @@ class World:
     def __init__(self, data: list):
         self.data = data
         self.tile_map: list = []
+        self.player_pos = None
 
         self.create_tiles()
 
@@ -51,20 +52,17 @@ class World:
                         )
                     )
 
-                #player
+                # Player tile
                 if tile == 9:
                     self.player_pos = tile_position
 
                 # TODO: more tiles
 
-        try:
-            self.player_pos
-        except AttributeError:
-            Logger.warn("No Player location set. Using default position.")
-            self.player_pos = (SCREEN_SIZE[0]//2,SCREEN_SIZE[1]//2)
+        if self.player_pos is None:
+            Logger.warn("No player tile set, using default position")
+            self.player_pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
 
-
-        Logger.log("Successfully created all tiles.")
+        Logger.log("Successfully created all tiles")
 
     def draw_tiles(self):
         for tile in self.tile_map:
