@@ -1,7 +1,7 @@
 """
 Map Maker for Some Platformer Game
-Created by duuuck and sheepy0125
-09/10/2012
+Created by duuuuck and sheepy0125
+09/10/2021
 """
 
 #############
@@ -12,7 +12,7 @@ import pygame
 from pathlib import Path
 from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
-from world import Tile, load_world, TILE_SIZE
+from world import Tile, TILE_SIZE, Tiles as WorldTiles
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 
@@ -28,19 +28,16 @@ pygame.display.set_caption("Map maker for Some Platformer Game")
 ### Classes ###
 ###############
 class Tiles:
-    tile_dict = {
-        # For max_amount, -1 is infinite
-        "1": {
-            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
-            "name": "dirt",
-            "max_amount": -1,
-        },
-        "9": {
-            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "player.png"),
-            "name": "player",
-            "max_amount": 1,
-        },
-    }
+    """
+    Tiles class which inherits from the Tiles class in world.py, but now
+    works for the map maker
+    Note: Doesn't actually use inheritance, just stores a copy of the tile dict
+    We're doing this because we don't wanna use super() to call it, nor use
+    a getter / setter for it
+    """
+
+    tile_dict = WorldTiles.tile_dict
+
     current_tile = 1
     # Set amount of tiles
     total_tiles = 0
@@ -265,7 +262,7 @@ def get_tile_idx(tile_location: tuple) -> tuple:
 
 
 def tile_exists(tile_idx: tuple):
-    
+
     return TileMap.tile_map[tile_idx[1]][tile_idx[0]] is not None
 
 
@@ -407,8 +404,12 @@ def main():
             if event.type == pygame.KEYUP:
                 # Reset map
                 if event.key == pygame.K_r:
+                    # Reset tile map
                     TileMap.create_tile_2d_array(map_size)
                     Tiles.total_tiles = 0
+                    for tile_id in Tiles.tile_dict:
+                        Tiles.tile_dict[tile_id]["amount"] = 0
+                    # Reset sidebar
                     sidebar.create_total_tiles_text()
 
                 # Debug print

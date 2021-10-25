@@ -1,6 +1,6 @@
 """
 Entities for Some Platformer Game
-Created by duuuck and sheepy0125
+Created by duuuuck and sheepy0125
 08/10/2021
 """
 
@@ -204,8 +204,6 @@ class Player(Entity):
 
         else:
             self.target_speed = 0
-
-        # None
 
         # Other keys
 
