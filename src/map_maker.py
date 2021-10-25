@@ -4,6 +4,10 @@ Created by duuuuck and sheepy0125
 09/10/2021
 """
 
+### Confirming dialog boxes
+CONFIRM_EXIT = True  # Confirm exiting the program
+CONFIRM_RESET = True  # Confirm resetting the map
+
 #############
 ### Setup ###
 #############
@@ -12,6 +16,7 @@ import pygame
 from pathlib import Path
 from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
+from tkinter.messagebox import askyesno
 from world import Tile, TILE_SIZE, Tiles as WorldTiles
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
@@ -233,6 +238,34 @@ class Sidebar:
 #################
 ### Functions ###
 #################
+def confirm_dialog(title: str, message: str) -> bool:
+    """Wraps tkinter.messagebox.askyesno"""
+
+    root = Tk()
+    root.withdraw()
+    answer = askyesno(title, message)
+    root.update()
+
+    return answer
+
+
+def quit_handling():
+    """Quits"""
+
+    # Confirm to quit
+    if CONFIRM_EXIT and (
+        not confirm_dialog(
+            "Quitting",
+            "Are you SURE you want to exit? "
+            "(to prevent this dialog, go to map_maker.py and set CONFIRM_EXIT to False",
+        )
+    ):
+        return
+
+    pygame.quit()
+    exit(0)
+
+
 def snap_to_grid(mouse_pos: tuple) -> tuple:
     """Returns the top left coordinate of a tile from a mouse position"""
 
@@ -397,13 +430,21 @@ def main():
         for event in pygame.event.get():
             # Quitting
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit(0)
+                quit_handling()
 
             # Keypress
             if event.type == pygame.KEYUP:
                 # Reset map
                 if event.key == pygame.K_r:
+                    # Confirm
+                    if CONFIRM_RESET and (
+                        not confirm_dialog(
+                            "Resetting map",
+                            "Are you SURE you want to reset the map? "
+                            "(to disable this message, go into map_maker.py and set CONFIRM_RESET to False)",
+                        )
+                    ):
+                        break
                     # Reset tile map
                     TileMap.create_tile_2d_array(map_size)
                     Tiles.total_tiles = 0
