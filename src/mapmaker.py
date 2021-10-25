@@ -11,6 +11,8 @@ clock = pygame.time.Clock()
 offset = [0, 0]
 
 TILE_SIZE = 50
+
+player = pygame.image.load(str(ROOT_PATH / "assets" / "images" / "tiles" / "player.png"))
 dirt = pygame.image.load(str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"))
 dirt = pygame.transform.scale(dirt, (TILE_SIZE, TILE_SIZE))
 
@@ -23,7 +25,7 @@ def snap_to_grid(mouse_pos: tuple) -> tuple:
     """Returns the top left coordinate of a tile from a mouse position"""
 
     return tuple(
-        [(int((mouse_pos[i] + offset[i]) / TILE_SIZE) * TILE_SIZE) for i in range(2)]
+        [((mouse_pos[i] + offset[i]) // TILE_SIZE) * TILE_SIZE for i in range(2)]
     )
 
 
