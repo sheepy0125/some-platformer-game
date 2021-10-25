@@ -16,16 +16,22 @@ TILE_SIZE = 50
 #######################
 class Tiles:
     """Dataclass for tiles"""
+    TILE_IMAGE_FOLDER = ROOT_PATH / "assets" / "images" / "tiles"
 
     tile_dict = {
         # For max_amount, -1 is infinite
         "1": {
-            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"),
+            "filepath": str(TILE_IMAGE_FOLDER / "dirt.png"),
             "name": "dirt",
             "max_amount": -1,
         },
+        "2": {
+            "filepath": str(TILE_IMAGE_FOLDER / "stone.png"),
+            "name": "Stone",
+            "max_amount": -1,
+        },
         "9": {
-            "filepath": str(ROOT_PATH / "assets" / "images" / "tiles" / "player.png"),
+            "filepath": str(TILE_IMAGE_FOLDER / "player.png"),
             "name": "player",
             "max_amount": 1,
         },
