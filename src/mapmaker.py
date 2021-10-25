@@ -4,6 +4,8 @@ from utils import Logger, ROOT_PATH
 
 from tkinter import filedialog, Tk
 
+Tk().withdraw()
+
 screen = pygame.display.set_mode((500, 500))
 
 clock = pygame.time.Clock()
@@ -12,7 +14,9 @@ offset = [0, 0]
 
 TILE_SIZE = 50
 
-player = pygame.image.load(str(ROOT_PATH / "assets" / "images" / "tiles" / "player.png"))
+player = pygame.image.load(
+    str(ROOT_PATH / "assets" / "images" / "tiles" / "player.png")
+)
 dirt = pygame.image.load(str(ROOT_PATH / "assets" / "images" / "tiles" / "dirt.png"))
 dirt = pygame.transform.scale(dirt, (TILE_SIZE, TILE_SIZE))
 
@@ -29,7 +33,37 @@ def snap_to_grid(mouse_pos: tuple) -> tuple:
     )
 
 
+def save_to_file(msg):
+    """Saves msg to the file the user selects"""
+    file = filedialog.asksaveasfile(
+        initialdir="C:\\Users\\ryden\\some-platformer-game\\src\\maps",
+        defaultextension=".map",
+        filetypes=[("MAP file", ".map"), ("All files", ".*")],
+    )
+    if file == None:
+        return
+    file.write(msg)
+    file.close()
+
+
+def open_file():
+    """Returns contents of the file the user selects"""
+    file = filedialog.askopenfile(
+        initialdir="C:\\Users\\ryden\\some-platformer-game\\src\\maps",
+        defaultextension=".map",
+        filetypes=[("MAP file", ".map"), ("All files", ".*")],
+    )
+
+    if file == None:
+        return
+    msg = file.read()
+    file.close()
+    return msg
+
+
 def export():
+    # TODO : write docstring
+
     tile_map = {}
 
     min_pos = [10000, 10000]
@@ -69,7 +103,6 @@ def export():
                 layer.append(tile_map[(i, j)])
             else:
                 layer.append(0)
-
         new_grid.append(layer)
 
     grid = ""
@@ -78,16 +111,8 @@ def export():
         for j in range(len(new_grid[0])):
             grid += str(new_grid[i][j])
         grid += "\n"
-    Tk().withdraw()
-    map_file = filedialog.asksaveasfile(
-        initialdir="C:\\Users\\ryden\\some-platformer-game\\src\\maps",
-        defaultextension=".map",
-        filetypes=[("MAP file", ".map"), ("All files", ".*")],
-    )
-    if map_file == None:
-        return
-    map_file.write(grid)
-    map_file.close()
+
+    save_to_file(grid)
 
 
 while True:
