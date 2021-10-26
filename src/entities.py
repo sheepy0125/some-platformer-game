@@ -78,18 +78,16 @@ class Entity:
         self.rect.x += round(self.vx)
 
         # Check horizontal collision
-        collision_list = self.get_tile_collisions(
-            [tile.rect for tile in world.map_list]
-        )
+        collision_list = self.get_tile_collisions(world.map_list)
         for tile in collision_list:
             # Moving right
             if self.vx > 0:
-                self.rect.right = tile.left
+                self.rect.right = tile.rect.left
                 self.collision_types["right"] = True
 
             # Moving left
             elif self.vx < 0:
-                self.rect.left = tile.right
+                self.rect.left = tile.rect.right
                 self.collision_types["left"] = True
 
             else:
@@ -105,18 +103,16 @@ class Entity:
         self.rect.y += self.vy
 
         # Check vertical collision
-        collision_list = self.get_tile_collisions(
-            [tile.rect for tile in world.map_list]
-        )
+        collision_list = self.get_tile_collisions(world.map_list)
         for tile in collision_list:
             # Moving up
             if self.vy < 0:
-                self.rect.top = tile.bottom
+                self.rect.top = tile.rect.bottom
                 self.collision_types["top"] = True
 
             # Moving down
             elif self.vy > 0:
-                self.rect.bottom = tile.top
+                self.rect.bottom = tile.rect.top
                 self.collision_types["bottom"] = True
                 if not self.prev_on_ground:
                     self.land_time = time()
