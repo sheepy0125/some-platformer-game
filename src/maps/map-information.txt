@@ -1,5 +1,20 @@
-good version coming soon
+Map information!
+A map must meet these requirements:
+    * Must have rows and columns of tiles
+    * Each tile must be a number from 0 to 9
+    * Could contain lines with newlines
 
-0 = sky
-1 = dirt
-9 = player tile
+Tile dictionary:
+    0 = sky
+    1 = dirt
+    2 = (unused)
+    3 = (unused)
+    4 = (unused)
+    5 = (unused)
+    6 = (unused)
+    7 = (unused)
+    8 = (unused)
+    9 = player tile
+
+Unused tiles will appear as 
+`/src/assets/images/tiles/error.png`
