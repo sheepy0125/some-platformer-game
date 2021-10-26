@@ -36,6 +36,11 @@ class Tiles:
             "name": "player",
             "max_amount": 1,
         },
+        "TileNotFound":{
+            "filepath": str(TILE_IMAGE_FOLDER / "error.png"),
+            "name": "TileNotFound",
+            "max_amount": -1,
+        }
     }
 
 
@@ -113,12 +118,14 @@ def load_world(filepath) -> dict:
             tile_position = (tile_idx * TILE_SIZE, row_idx * TILE_SIZE)
 
             # Normal tiles
+
+
             if int(tile) < 8:
                 # Assert the tile is a valid tile
+
                 if not tile in Tiles.tile_dict:
                     not_valid_tile_warn(row_idx, tile_idx, tile)
-                    continue
-
+                    tile = "TileNotFound"
                 # Create tile
                 tile_instance = Tile(
                     pos=tile_position,
@@ -129,11 +136,12 @@ def load_world(filepath) -> dict:
                 continue
 
             # Player position tile
-            if tile == 9:
+            if int(tile) == 9:
                 player_pos = (
                     tile_position[0] + TILE_SIZE // 2,
                     tile_position[1] + TILE_SIZE // 2,
                 )
+                print(player_pos)
                 continue
 
             not_valid_tile_warn(row_idx, tile_idx, tile)
@@ -143,8 +151,6 @@ def load_world(filepath) -> dict:
         Logger.warn("No player tile set, using default position")
         player_pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
 
-    print(len(tiles))
-    for tile in tiles:
-        print(tile.id)
+
 
     return {"map_list": tiles, "player_pos": player_pos}

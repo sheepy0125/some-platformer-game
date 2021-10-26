@@ -1,9 +1,3 @@
-# Duuuuck.
-# This map maker is crap.
-# Do not attempt to push this any more.
-# You will not be able to.
-# Why?
-# Why do you like this horrible code?
-# Why are you making another map maker when we have a perfectly functional map maker?
-# Why does your code look like it was given to an AI and baked in the microwave?
-# No.
+version https://git-lfs.github.com/spec/v1
+oid sha256:c1a7dc63fd5854bbeb433ea00fb8020ad1ffe27553651915708f73c6106955a7
+size 5234
