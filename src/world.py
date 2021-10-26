@@ -16,6 +16,7 @@ TILE_SIZE = 50
 #######################
 class Tiles:
     """Dataclass for tiles"""
+
     TILE_IMAGE_FOLDER = ROOT_PATH / "assets" / "images" / "tiles"
 
     tile_dict = {
