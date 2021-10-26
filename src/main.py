@@ -15,7 +15,7 @@ from world import World, load_world
 
 # Create world
 map_data = load_world(MAP_PATH)
-world = World(map_list=map_data["map_list"], player_pos=map_data["player_pos"])
+world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"])
 
 # Create entities
 player = Player(world.player_pos)
