@@ -56,9 +56,8 @@ class World:
         self.player_pos = player_pos
 
     def draw_tiles(self):
-        for row in self.map_array:
-            for tile in row:
-                tile.draw()
+        for tile in self.map_list:
+            tile.draw()
 
 
 ##################
@@ -88,10 +87,10 @@ class Tile:
         )
 
 
-####################
-### World loader ###
-####################
-def load_world(filepath) -> dict:
+##################
+### Map loader ###
+##################
+def load_map(filepath) -> dict:
     """Returns a 2D array of Tiles"""
 
     def not_valid_tile_warn(x: int, y: int, tile: str):
@@ -102,15 +101,16 @@ def load_world(filepath) -> dict:
         )
 
     with open(filepath) as world_file:
-        world_file_str = world_file.read()
+        map_file_str = world_file.read()
 
     map_array: list[Tile] = []
     player_pos = None
-    for row_idx, row in enumerate(world_file_str.split("\n")):
+    for row_idx, row in enumerate(map_file_str.split("\n")):
         map_array.append([])
         for tile_idx, tile in enumerate(row):
             # The tile is air
             if int(tile) == 0:
+                map_array[row_idx].append(None)
                 continue
 
             # tile_idx is x multiplier
@@ -160,5 +160,9 @@ def convert_map_to_list(map_array: list[list]) -> list:
     return_list = []
     for row in map_array:
         for tile in row:
+            # Assert the tile is not NoneType
+            if tile is None:
+                continue
+
             return_list.append(tile)
     return return_list

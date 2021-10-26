@@ -11,10 +11,10 @@ from pygame_setup import pygame, screen, clock, SCROLL_OFFSET
 from config_parser import FPS, MAP_PATH
 from entities import Player, Entity
 from utils import Logger, Scrolling, ROOT_PATH
-from world import World, load_world
+from world import World, load_map
 
 # Create world
-map_data = load_world(MAP_PATH)
+map_data = load_map(MAP_PATH)
 world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"])
 
 # Create entities
