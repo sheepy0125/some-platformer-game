@@ -132,109 +132,112 @@ class TileMap:
 
 class Sidebar:
     def __init__(self):
+        self.spacing = 15
+        self.text_idx = 0
+        self.image_size = 128
+
         # Background
         self.background_rect = pygame.Rect((0, 0), (SIDEBAR_SIZE[0], SIDEBAR_SIZE[1]))
 
         # Texts
         self.texts = [
-            Text(
-                "Map Maker!",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 15),
-            ),
-            Text(
-                "LMB: Place, RMB: Destroy",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 30),
-            ),
-            Text(
-                "Press the arrow keys to scroll",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 45),
-            ),
-            Text(
-                "Press R to reset",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 60),
-            ),
-            Text(
-                "Press E to export",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 75),
-            ),
-            Text(
-                "Press P to debug print the map",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 90),
-            ),
-            Text(
-                "Press N to switch to the next block",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 105),
-            ),
-            Text(
-                "Press B to switch to the prev block",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 120),
-            ),
-            Text(
-                "Press return to test out the map",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 135),
-            ),
-            Text(
+            self.create_text("Map Maker!"),
+            self.create_text("LMB: Place, RMB: Destroy"),
+            self.create_text("Press the arrow keys to scroll"),
+            self.create_text("Press R to reset"),
+            self.create_text("Press E to export"),
+            self.create_text("Press I to import"),
+            self.create_text("Press P to debug print the map"),
+            self.create_text("Press N to switch to the next block"),
+            self.create_text("Press B to switch to the prev block"),
+            self.create_text("Press return to test out the map"),
+            self.create_text(
                 "Available tiles",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, 210 + 128),
+                pos=(
+                    SIDEBAR_SIZE[0] // 2,
+                    (self.text_idx * self.spacing) + self.image_size,
+                ),
             ),
-            Text(
+            self.create_text(
                 f"{MapSize.size[0]}x{MapSize.size[1]}",
-                size=12,
-                pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - 15),
+                pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - self.spacing),
             ),
         ]
-        self.create_scroll_text()
         self.create_current_tile_widgets()
         self.create_total_tiles_text()
+        self.create_scroll_text()
 
         # Available tile texts
         self.available_tile_texts = []
         for tile_idx, (tile_id, available_tile) in enumerate(Tiles.tile_dict.items()):
             # Please note: tile_id is a string, not an int
             self.available_tile_texts.append(
-                Text(
+                self.create_text(
                     f"Tile {tile_id}: {available_tile['name']}",
-                    size=12,
-                    pos=(SIDEBAR_SIZE[0] // 2, (225 + 128 + (15 * tile_idx))),
+                    pos=(
+                        SIDEBAR_SIZE[0] // 2,
+                        (
+                            (tile_idx * self.spacing)
+                            + (self.current_tile_image_rect.bottom + self.spacing)
+                        ),
+                    ),
+                    update_idx=False,
                 )
             )
 
-    def create_scroll_text(self):
-        self.currently_scrolling_text = Text(
-            f"Scroll X: {Scrolling.scroll_x} | Scroll Y: {Scrolling.scroll_y}",
+    def create_text(
+        self, text: str, pos: tuple = None, update_idx: bool = True
+    ) -> Text:
+        """Creates a text"""
+
+        # Create position if not provided
+        if pos is None:
+            pos = (SIDEBAR_SIZE[0] // 2, self.spacing * (self.text_idx + 1))
+
+        if update_idx:
+            self.text_idx += 1
+
+        return Text(
+            text_to_display=text,
             size=12,
-            pos=(SIDEBAR_SIZE[0] // 2, 150),
+            pos=pos,
+        )
+
+    def create_scroll_text(self):
+        self.currently_scrolling_text = self.create_text(
+            f"Scroll X: {Scrolling.scroll_x} | Scroll Y: {Scrolling.scroll_y}",
+            pos=(
+                SIDEBAR_SIZE[0] // 2,
+                (self.current_tile_image_rect.top - (self.spacing * 3)),
+            ),
+            update_idx=False,
         )
 
     def create_current_tile_widgets(self):
-        self.current_tile_text = Text(
+        image_y_pos = (self.spacing * self.text_idx) + (self.spacing * 3)
+
+        self.current_tile_text = self.create_text(
             f"Current tile: {Tiles.tile_dict[str(Tiles.current_tile)]['name']}",
-            size=12,
-            pos=(SIDEBAR_SIZE[0] // 2, 180),
+            pos=(
+                SIDEBAR_SIZE[0] // 2,
+                image_y_pos - self.spacing,
+            ),
+            update_idx=False,
         )
         self.current_tile_image = pygame.transform.scale(
             pygame.image.load(Tiles.tile_dict[str(Tiles.current_tile)]["filepath"]),
             (128, 128),
         )
         self.current_tile_image_rect = self.current_tile_image.get_rect(
-            centerx=(SIDEBAR_SIZE[0] // 2), top=195
+            centerx=(SIDEBAR_SIZE[0] // 2),
+            top=image_y_pos,
         )
 
     def create_total_tiles_text(self):
-        self.total_tiles_text = Text(
+        self.total_tiles_text = self.create_text(
             f"Total tiles: {Tiles.total_tiles}",
-            size=12,
-            pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - 30),
+            pos=(SIDEBAR_SIZE[0] // 2, (SIDEBAR_SIZE[1] - (self.spacing * 2))),
+            update_idx=False,
         )
 
     def draw(self):
