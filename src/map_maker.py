@@ -4,27 +4,25 @@ Created by duuuuck and sheepy0125
 09/10/2021
 """
 
-### Confirming dialog boxes
-CONFIRM_EXIT = True  # Confirm exiting the program
-CONFIRM_RESET = True  # Confirm resetting the map
-
 #############
 ### Setup ###
 #############
 # Import
 import pygame
-from pathlib import Path
 from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
 from tkinter.messagebox import askyesno
 from world import Tile, TILE_SIZE, Tiles as WorldTiles
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
+from os import system, remove
 
 SCREEN_SIZE = (800, 800)
 SIDEBAR_SIZE = (200, 800)
 screen = pygame.display.set_mode(SCREEN_SIZE)
 clock = pygame.time.Clock()
+DEFAULT_MAP_FILEPATH = None
+TEMP_MAP_FILEPATH = str(ROOT_PATH / "src" / "maps" / "temp_map.map")
 
 # Setup
 pygame.display.set_caption("Map maker for Some Platformer Game")
@@ -32,6 +30,17 @@ pygame.display.set_caption("Map maker for Some Platformer Game")
 ###############
 ### Classes ###
 ###############
+class ConfirmDialogBoxConfig:
+    """
+    Configuration for the confirm dialog boxes
+    (at the top for easy to change)
+    """
+
+    confirm_exit = True  # Confirm exiting the program
+    confirm_reset = True  # Confirm resetting the map
+    confirm_run = False  # Confirm test running map
+
+
 class Tiles:
     """
     Tiles class which inherits from the Tiles class in world.py, but now
@@ -169,6 +178,11 @@ class Sidebar:
                 pos=(SIDEBAR_SIZE[0] // 2, 120),
             ),
             Text(
+                "Press return to test out the map",
+                size=12,
+                pos=(SIDEBAR_SIZE[0] // 2, 135),
+            ),
+            Text(
                 "Available tiles",
                 size=12,
                 pos=(SIDEBAR_SIZE[0] // 2, 210 + 128),
@@ -253,17 +267,35 @@ def quit_handling():
     """Quits"""
 
     # Confirm to quit
-    if CONFIRM_EXIT and (
+    if ConfirmDialogBoxConfig.confirm_exit and (
         not confirm_dialog(
             "Quitting",
             "Are you SURE you want to exit? "
-            "(to prevent this dialog, go to map_maker.py and set CONFIRM_EXIT to False",
+            "(to prevent this dialog, go to map_maker.py and set confirm_exit to False",
         )
     ):
         return
 
     pygame.quit()
     exit(0)
+
+
+def run_map():
+    """Run the map"""
+
+    # Save the map in a temporary file
+    export(TEMP_MAP_FILEPATH)
+
+    # Open main.py with the temp map file as the argument
+    system(f"python3 {(ROOT_PATH / 'src' / 'main.py')!s} {TEMP_MAP_FILEPATH}")
+
+    # Remove the temp map file
+    remove(TEMP_MAP_FILEPATH)
+
+
+###########################
+### Map maker functions ###
+###########################
 
 
 def snap_to_grid(mouse_pos: tuple) -> tuple:
@@ -342,14 +374,18 @@ def destroy_tile(mouse_pos):
     Tiles.tile_dict[str(tile_id)]["amount"] -= 1
 
 
-def export():
+def export(filepath=None):
     """Save tile to a file"""
 
     map_string = TileMap.convert_array_to_string()
-    # Get filepath to export to
-    Tk().withdraw()
-    map_file = filedialog.asksaveasfile()
-    Logger.log(f"Exporting map to {map_file.name}")
+
+    if filepath is None:
+        # Get filepath to export to
+        Tk().withdraw()
+        map_file = filedialog.asksaveasfile()
+        Logger.log(f"Exporting map to {map_file.name}")
+    else:
+        map_file = open(filepath, "w")
 
     with map_file:
         map_file.truncate(0)
@@ -437,11 +473,11 @@ def main():
                 # Reset map
                 if event.key == pygame.K_r:
                     # Confirm
-                    if CONFIRM_RESET and (
+                    if ConfirmDialogBoxConfig.confirm_reset and (
                         not confirm_dialog(
                             "Resetting map",
                             "Are you SURE you want to reset the map? "
-                            "(to disable this message, go into map_maker.py and set CONFIRM_RESET to False)",
+                            "(to disable this message, go into map_maker.py and set confirm_reset to False)",
                         )
                     ):
                         break
@@ -456,6 +492,25 @@ def main():
                 # Debug print
                 elif event.key == pygame.K_p:
                     TileMap.debug_print()
+
+                # Test run map
+                elif event.key == pygame.K_RETURN:
+                    # Confirm
+                    if ConfirmDialogBoxConfig.confirm_run and (
+                        not confirm_dialog(
+                            "Running map",
+                            "Are you SURE you want to run the map? "
+                            "(to disable this message, go into map_maker.py and set confirm_run to False)",
+                        )
+                    ):
+                        break
+
+                    # Run map
+                    try:
+                        run_map()
+                    except Exception as error:
+                        Logger.fatal("Failed to test run map")
+                        Logger.log_error(error)
 
                 # Export
                 elif event.key == pygame.K_e:

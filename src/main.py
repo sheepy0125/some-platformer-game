@@ -8,13 +8,13 @@ Created by duuuuck and sheepy0125
 #############
 
 from pygame_setup import pygame, screen, clock, SCROLL_OFFSET
-from config_parser import FPS
+from config_parser import FPS, MAP_PATH
 from entities import Player, Entity
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World, load_world
 
 # Create world
-world = World(load_world(str(ROOT_PATH / "src" / "maps" / "0-test.map")))
+world = World(load_world(MAP_PATH))
 
 # Create entities
 player = Player(world.player_pos)
