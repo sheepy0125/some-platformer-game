@@ -45,13 +45,15 @@ class Tiles:
 class World:
     """Handles all tiles in the world"""
 
-    def __init__(self, map_list: list, player_pos: tuple):
-        self.map_list: list = map_list
+    def __init__(self, map_array: list[list], player_pos: tuple):
+        self.map_array = map_array
+        self.map_list = convert_map_to_list(map_array)
         self.player_pos = player_pos
 
     def draw_tiles(self):
-        for tile in self.map_list:
-            tile.draw()
+        for row in self.map_array:
+            for tile in row:
+                tile.draw()
 
 
 ##################
@@ -97,14 +99,13 @@ def load_world(filepath) -> dict:
     with open(filepath) as world_file:
         world_file_str = world_file.read()
 
-    map_list = world_file_str.split("\n")
-    tiles: list[Tile] = []
+    map_array: list[Tile] = []
     player_pos = None
-    for row_idx, row in enumerate(map_list):
+    for row_idx, row in enumerate(world_file_str.split("\n")):
+        map_array.append([])
         for tile_idx, tile in enumerate(row):
             # The tile is air
             if int(tile) == 0:
-                Logger.log("The tile is air")
                 continue
 
             # tile_idx is x multiplier
@@ -125,11 +126,11 @@ def load_world(filepath) -> dict:
                     image_path=Tiles.tile_dict[tile]["filepath"],
                     id=tile,
                 )
-                tiles.append(tile_instance)
+                map_array[row_idx].append(tile_instance)
                 continue
 
             # Player position tile
-            if tile == 9:
+            if int(tile) == 9:
                 player_pos = (
                     tile_position[0] + TILE_SIZE // 2,
                     tile_position[1] + TILE_SIZE // 2,
@@ -143,8 +144,14 @@ def load_world(filepath) -> dict:
         Logger.warn("No player tile set, using default position")
         player_pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
 
-    print(len(tiles))
-    for tile in tiles:
-        print(tile.id)
+    return {"map_array": map_array, "player_pos": player_pos}
 
-    return {"map_list": tiles, "player_pos": player_pos}
+
+def convert_map_to_list(map_array: list[list]) -> list:
+    """Converts the 2D array to a list"""
+
+    return_list = []
+    for row in map_array:
+        for tile in row:
+            return_list.append(tile)
+    return return_list
