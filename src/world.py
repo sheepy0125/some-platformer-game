@@ -16,6 +16,7 @@ TILE_SIZE = 50
 #######################
 class Tiles:
     """Dataclass for tiles"""
+
     TILE_IMAGE_FOLDER = ROOT_PATH / "assets" / "images" / "tiles"
 
     tile_dict = {
@@ -127,7 +128,6 @@ class Tile:
 ### World loader ###
 ####################
 def load_world(filepath) -> list:
-    # Assume the world file consists of 60x10 of 0s and 1s
     data_array: list = []
     with open(filepath) as world_file:
         rows: list = world_file.readlines()
@@ -153,3 +153,27 @@ def load_world(filepath) -> list:
 
     Logger.log("Succesfully loaded world")
     return data_array
+
+
+# Fix world loaded
+def fixed_load_word(filepath) -> list[list]:
+    """Returns a 2D array of Tiles"""
+
+    with open(filepath) as world_file:
+        world_file_str = world_file.read()
+
+    # Split into rows
+    map_list = world_file_str.split("\n")
+
+    # Create 2D array
+    map_array: list[list] = []
+    for row_idx, row in enumerate(map_list):
+        map_array.append([])
+        for tile_idx, tile in enumerate(row):
+            # Create tile
+            tile = Tile(
+                pos=(row_idx * TILE_SIZE, tile_idx * TILE_SIZE),
+                image_path=Tiles.tile_dict[str(tile)]["filepath"],
+                id=tile,
+            )
+            map_array[row_idx].append(int(tile))
