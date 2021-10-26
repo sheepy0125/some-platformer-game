@@ -79,7 +79,7 @@ class Entity:
 
         # Check horizontal collision
         collision_list = self.get_tile_collisions(
-            [tile.rect for tile in world.tile_map]
+            [tile.rect for tile in world.map_list]
         )
         for tile in collision_list:
             # Moving right
@@ -106,7 +106,7 @@ class Entity:
 
         # Check vertical collision
         collision_list = self.get_tile_collisions(
-            [tile.rect for tile in world.tile_map]
+            [tile.rect for tile in world.map_list]
         )
         for tile in collision_list:
             # Moving up

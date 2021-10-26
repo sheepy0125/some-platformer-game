@@ -45,55 +45,12 @@ class Tiles:
 class World:
     """Handles all tiles in the world"""
 
-    def __init__(self, data: list):
-        self.data = data
-        self.tile_map: list = []
-        self.player_pos = None
-
-        self.create_tiles()
-
-    def create_tiles(self):
-        for row_idx, row in enumerate(self.data):
-            for tile_idx, tile in enumerate(row):
-                # NOTE: tile is an int
-
-                # Don't need to draw any tiles if it's air
-                if tile == 0:
-                    continue
-
-                # tile_idx is x multiplier
-                # row_idx is y multiplier
-                # Positions are bound to top left
-                tile_position = (tile_idx * TILE_SIZE, row_idx * TILE_SIZE)
-
-                # Normal tiles (1-8)
-                if tile < 8:
-                    self.tile_map.append(
-                        Tile(
-                            pos=tile_position,
-                            image_path=Tiles.tile_dict[str(tile)]["filepath"],
-                            id=tile,
-                        )
-                    )
-
-                # Player tile
-                if tile == 9:
-                    # Convert top left of tile posititon to center
-                    self.player_pos = (
-                        tile_position[0] + TILE_SIZE // 2,
-                        tile_position[1] + TILE_SIZE // 2,
-                    )
-
-                # TODO: more normal tiles
-
-        if self.player_pos is None:
-            Logger.warn("No player tile set, using default position")
-            self.player_pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
-
-        Logger.log("Successfully created all tiles")
+    def __init__(self, map_list: list, player_pos: tuple):
+        self.map_list: list = map_list
+        self.player_pos = player_pos
 
     def draw_tiles(self):
-        for tile in self.tile_map:
+        for tile in self.map_list:
             tile.draw()
 
 
@@ -127,53 +84,67 @@ class Tile:
 ####################
 ### World loader ###
 ####################
-def load_world(filepath) -> list:
-    data_array: list = []
-    with open(filepath) as world_file:
-        rows: list = world_file.readlines()
-        # Iterate through rows
-        for row_idx in range(len(rows)):
-            data_array.append([])
-            row_text: str = rows[row_idx]
-            # Iterate through tiles
-            for tile_text in row_text:
-                # If new line, don't bother
-                if tile_text == "\n":
-                    continue
-
-                tile: int = int(tile_text)
-
-                # Append
-                data_array[row_idx].append(tile)
-
-    if (row_num := len(data_array)) < 10:
-        Logger.warn(f"Data array has under 10 rows (has {row_num} rows)")
-    else:
-        Logger.log(f"Data array has {row_num} rows")
-
-    Logger.log("Succesfully loaded world")
-    return data_array
-
-
-# Fix world loaded
-def fixed_load_word(filepath) -> list[list]:
+def load_world(filepath) -> dict:
     """Returns a 2D array of Tiles"""
+
+    def not_valid_tile_warn(x: int, y: int, tile: str):
+        """Warns that the tile isn't valid"""
+
+        Logger.warn(
+            f"The tile at position ({x}, {y}) is {tile}, which is not a valid tile!"
+        )
 
     with open(filepath) as world_file:
         world_file_str = world_file.read()
 
-    # Split into rows
     map_list = world_file_str.split("\n")
-
-    # Create 2D array
-    map_array: list[list] = []
+    tiles: list[Tile] = []
+    player_pos = None
     for row_idx, row in enumerate(map_list):
-        map_array.append([])
         for tile_idx, tile in enumerate(row):
-            # Create tile
-            tile = Tile(
-                pos=(row_idx * TILE_SIZE, tile_idx * TILE_SIZE),
-                image_path=Tiles.tile_dict[str(tile)]["filepath"],
-                id=tile,
-            )
-            map_array[row_idx].append(int(tile))
+            # The tile is air
+            if int(tile) == 0:
+                Logger.log("The tile is air")
+                continue
+
+            # tile_idx is x multiplier
+            # row_idx is y multiplier
+            # Positions are bound to top left
+            tile_position = (tile_idx * TILE_SIZE, row_idx * TILE_SIZE)
+
+            # Normal tiles
+            if int(tile) < 8:
+                # Assert the tile is a valid tile
+                if not tile in Tiles.tile_dict:
+                    not_valid_tile_warn(row_idx, tile_idx, tile)
+                    continue
+
+                # Create tile
+                tile_instance = Tile(
+                    pos=tile_position,
+                    image_path=Tiles.tile_dict[tile]["filepath"],
+                    id=tile,
+                )
+                tiles.append(tile_instance)
+                continue
+
+            # Player position tile
+            if tile == 9:
+                player_pos = (
+                    tile_position[0] + TILE_SIZE // 2,
+                    tile_position[1] + TILE_SIZE // 2,
+                )
+                continue
+
+            not_valid_tile_warn(row_idx, tile_idx, tile)
+
+    # No player position tile
+    if player_pos is None:
+        Logger.warn("No player tile set, using default position")
+        player_pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
+
+    print(len(tiles))
+    for tile in tiles:
+        print(tile.id)
+
+    return {"map_list": tiles, "player_pos": player_pos}

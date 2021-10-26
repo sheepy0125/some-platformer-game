@@ -14,7 +14,8 @@ from utils import Logger, Scrolling, ROOT_PATH
 from world import World, load_world
 
 # Create world
-world = World(load_world(MAP_PATH))
+map_data = load_world(MAP_PATH)
+world = World(map_list=map_data["map_list"], player_pos=map_data["player_pos"])
 
 # Create entities
 player = Player(world.player_pos)
