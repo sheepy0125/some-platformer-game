@@ -28,7 +28,7 @@ class Tiles:
         },
         "2": {
             "filepath": str(TILE_IMAGE_FOLDER / "stone.png"),
-            "name": "Stone",
+            "name": "stone",
             "max_amount": -1,
         },
         "9": {
@@ -36,9 +36,9 @@ class Tiles:
             "name": "player",
             "max_amount": 1,
         },
-        "TileNotFound": {
+        "_tile_not_found": {
             "filepath": str(TILE_IMAGE_FOLDER / "error.png"),
-            "name": "TileNotFound",
+            "name": "TILE_NOT_FOUND",
             "max_amount": -1,
         },
     }
@@ -124,7 +124,7 @@ def load_map(filepath) -> dict:
                 # Assert the tile is a valid tile
                 if not tile in Tiles.tile_dict:
                     not_valid_tile_warn(row_idx, tile_idx, tile)
-                    tile = "TileNotFound"
+                    tile = "_tile_not_found"
 
                 # Create tile
                 tile_instance = Tile(

@@ -14,7 +14,7 @@ from tkinter.ttk import Spinbox
 from tkinter.messagebox import askyesno
 
 from pygame.display import update
-from world import Tile, TILE_SIZE, Tiles as WorldTiles, load_map, convert_map_to_list
+from world import Tile, Tiles as WorldTiles, load_map, TILE_SIZE
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 from os import system, remove
@@ -78,6 +78,11 @@ class Tiles:
         # Get the new tile ID from the dictionary keys
         # We need to do this because tile indeces are not (always) sequential
         tile_keys = list(Tiles.tile_dict.keys())
+        # Don't allow special tiles to be selected
+        for tile_idx, tile in enumerate(tile_keys):
+            if tile.startswith("_"):
+                tile_keys.pop(tile_idx)
+
         current_tile_index = tile_keys.index(str(Tiles.current_tile))
         # Find the index of the new tile
         if next_tile:
@@ -176,6 +181,12 @@ class Sidebar:
         self.available_tile_texts = []
         for tile_idx, (tile_id, available_tile) in enumerate(Tiles.tile_dict.items()):
             # Please note: tile_id is a string, not an int
+
+            # Don't allow special tiles to be selected
+            if tile_id.startswith("_"):
+                tile_idx -= 1
+                continue
+
             self.available_tile_texts.append(
                 self.create_text(
                     f"Tile {tile_id}: {available_tile['name']}",
@@ -533,7 +544,8 @@ def main():
                         not confirm_dialog(
                             "Resetting map",
                             "Are you SURE you want to reset the map? "
-                            "(to disable this message, go into map_maker.py and set confirm_reset to False)",
+                            "(to disable this message, go into map_maker.py "
+                            "and set confirm_reset to False)",
                         )
                     ):
                         break
@@ -556,7 +568,8 @@ def main():
                         not confirm_dialog(
                             "Running map",
                             "Are you SURE you want to run the map? "
-                            "(to disable this message, go into map_maker.py and set confirm_run to False)",
+                            "(to disable this message, go into map_maker.py and "
+                            "set confirm_run to False)",
                         )
                     ):
                         break
