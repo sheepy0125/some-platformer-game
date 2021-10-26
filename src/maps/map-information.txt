@@ -2,7 +2,7 @@ Map information!
 A map must meet these requirements:
     * Must have rows and columns of tiles
     * Each tile must be a number from 0 to 9
-    * Could contain lines with newlines
+    * Cannot contain lines with newlines
 
 Tile dictionary:
     0 = sky
