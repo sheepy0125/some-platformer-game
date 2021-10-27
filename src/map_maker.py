@@ -12,8 +12,6 @@ import pygame
 from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
 from tkinter.messagebox import askyesno
-
-from pygame.display import update
 from world import Tile, Tiles as WorldTiles, load_map, TILE_SIZE
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
