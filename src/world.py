@@ -120,7 +120,7 @@ def load_map(filepath) -> dict:
 
             # Normal tiles
 
-            if int(tile) < 8:
+            if int(tile) < 7:
                 # Assert the tile is a valid tile
                 if not tile in Tiles.tile_dict:
                     not_valid_tile_warn(row_idx, tile_idx, tile)

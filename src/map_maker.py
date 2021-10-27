@@ -46,6 +46,7 @@ class MapSize:
     """Dataclass for map size"""
 
     size = (0, 0)
+    resizable = False
 
 
 class Tiles:
@@ -441,7 +442,12 @@ def destroy_tile(mouse_pos):
 def resize_map():
     """Resizes the map"""
 
+    if not MapSize.resizable:
+        raise ValueError("The map isn't resizable!")
+        return
+
     # TODO: Use Tkinter instead
+    # FIXME: Update total tiles
 
     # Get the new map size
     new_size = (
