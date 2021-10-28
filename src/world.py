@@ -22,11 +22,16 @@ class Tiles:
     tile_dict = {
         # For max_amount, -1 is infinite
         "1": {
+            "filepath": str(TILE_IMAGE_FOLDER / "grass.png"),
+            "name": "grass",
+            "max_amount": -1,
+        },
+        "2": {
             "filepath": str(TILE_IMAGE_FOLDER / "dirt.png"),
             "name": "dirt",
             "max_amount": -1,
         },
-        "2": {
+        "3": {
             "filepath": str(TILE_IMAGE_FOLDER / "stone.png"),
             "name": "stone",
             "max_amount": -1,
