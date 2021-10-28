@@ -130,3 +130,6 @@ dmypy.json
 
 # Some other stuff
 .vscode/
+
+# Why?
+src/mapmaker.py

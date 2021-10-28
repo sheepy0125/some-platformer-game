@@ -31,6 +31,11 @@ class Tiles:
             "name": "stone",
             "max_amount": -1,
         },
+        "8": {
+            "filepath": str(TILE_IMAGE_FOLDER / "end.png"),
+            "name": "end",
+            "max_amount": 1,
+        },
         "9": {
             "filepath": str(TILE_IMAGE_FOLDER / "player.png"),
             "name": "player",
@@ -120,7 +125,7 @@ def load_map(filepath) -> dict:
 
             # Normal tiles
 
-            if int(tile) < 8:
+            if int(tile) < 7:
                 # Assert the tile is a valid tile
                 if not tile in Tiles.tile_dict:
                     not_valid_tile_warn(row_idx, tile_idx, tile)
@@ -134,6 +139,13 @@ def load_map(filepath) -> dict:
                 )
                 map_array[row_idx].append(tile_instance)
                 continue
+
+            # Ending tile
+            if int(tile) == 8:
+                Logger.warn(
+                    "Hey, there's an ending tile here, but there's nothing "
+                    "to handle it! Whoops, that sucks!"
+                )
 
             # Player position tile
             if int(tile) == 9:
