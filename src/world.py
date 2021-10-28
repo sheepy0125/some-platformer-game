@@ -158,7 +158,6 @@ def load_map(filepath) -> dict:
                     tile_position[0] + TILE_SIZE // 2,
                     tile_position[1] + TILE_SIZE // 2,
                 )
-                print(player_pos)
                 continue
 
             not_valid_tile_warn(row_idx, tile_idx, tile)

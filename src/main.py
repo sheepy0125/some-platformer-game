@@ -7,11 +7,11 @@ Created by duuuuck and sheepy0125
 ### Setup ###
 #############
 
-from pygame_setup import pygame, screen, clock, SCROLL_OFFSET
+from pygame_setup import pygame, screen, clock, SCROLL_OFFSET, SCREEN_SIZE
 from config_parser import FPS, MAP_PATH
 from entities import Player, Entity
-from utils import Logger, Scrolling, ROOT_PATH
-from world import World, load_map
+from utils import Logger, Scrolling
+from world import World, load_map, TILE_SIZE
 
 # Create world
 map_data = load_map(MAP_PATH)
@@ -21,6 +21,12 @@ world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"]
 player = Player(world.player_pos)
 entities: list[Entity] = []
 
+# Setup scrolling
+Scrolling.setup_scrolling(
+    map_size=(len(world.map_array), len(world.map_array[0])),
+    tile_size=TILE_SIZE,
+    screen_size=SCREEN_SIZE,
+)
 
 while True:
     # Event handling
@@ -35,12 +41,7 @@ while True:
     player.move(world=world)
 
     # Scroll world
-    Scrolling.scroll_x += (
-        player.rect.centerx - Scrolling.scroll_x - SCROLL_OFFSET[0]
-    ) / 10
-    Scrolling.scroll_y += (
-        player.rect.centery - Scrolling.scroll_y - SCROLL_OFFSET[1]
-    ) / 10
+    Scrolling.update_scrolling(player.rect.center, SCREEN_SIZE, SCROLL_OFFSET)
 
     # Draw
     screen.fill("blue")
