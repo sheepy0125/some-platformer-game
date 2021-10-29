@@ -13,6 +13,8 @@ from entities import Player, Entity
 from utils import Logger, Scrolling
 from world import World, load_map, TILE_SIZE
 
+from time import time
+
 # Create world
 map_data = load_map(MAP_PATH)
 world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"], end_tile = map_data["end_tile"])
@@ -21,15 +23,21 @@ world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"]
 player = Player(world.player_pos)
 entities: list[Entity] = []
 
+
 # Setup scrolling
 Scrolling.setup_scrolling(
     map_size=(len(world.map_array), len(world.map_array[0])),
     tile_size=TILE_SIZE,
-    screen_size=SCREEN_SIZE,
+    screen_size=SCREEN_SIZE
 )
-
+d = time()
 while True:
+    if time() - d > .165:
+        print(1/(time() - d))
+    d = time()
     # Event handling
+
+
     for event in pygame.event.get():
         # Exit
         if event.type == pygame.QUIT:
@@ -38,7 +46,13 @@ while True:
             exit(0)
 
     player.event_handler()
+
     player.move(world=world)
+        # map_data = load_map(MAP_PATH)
+        # world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"], end_tile = map_data["end_tile"])
+
+
+        # player = Player(world.player_pos)
 
     # Scroll world
     Scrolling.update_scrolling(player.rect.center, SCREEN_SIZE, SCROLL_OFFSET)
@@ -47,6 +61,7 @@ while True:
     screen.fill("blue")
     world.draw_tiles()
     player.draw()
+
     pygame.display.update()
 
     clock.tick(FPS)

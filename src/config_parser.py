@@ -21,7 +21,7 @@ try:
     if len(argv) > 1:
         MAP_PATH /= argv[1]
     else:
-        MAP_PATH /= "0-test.map"
+        MAP_PATH /= "1-parkour.map"
     MAP_PATH = str(MAP_PATH)
 
 

@@ -173,8 +173,10 @@ class Player(Entity):
             self.vx += speed_dif / 10
 
         super().move(world)
-        if world.end_tile.rect.colliderect(self.rect): #kill me now
-            pass # load new level
+        try:
+            return world.end_tile.rect.colliderect(self.rect) #kill me now
+        except AttributeError:
+            return False
 
     def event_handler(self):
         keys: dict = pygame.key.get_pressed()

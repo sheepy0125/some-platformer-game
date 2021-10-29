@@ -69,8 +69,10 @@ class World:
     def draw_tiles(self):
         for tile in self.map_list:
             tile.draw()
-        self.end_tile.draw()
-
+        try:
+            self.end_tile.draw()
+        except AttributeError:
+            pass
 
 ##################
 ### Tile class ###
@@ -97,6 +99,10 @@ class Tile:
         screen.blit(
             self.surface, (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y)
         )
+        rect_thing = self.surface.get_rect()
+        rect_thing.x -= Scrolling.scroll_x
+        rect_thing.y -= Scrolling.scroll_y
+        pygame.draw.rect(screen,(255,255,255),rect_thing)
 
 
 ##################
