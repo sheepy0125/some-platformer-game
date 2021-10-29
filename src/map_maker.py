@@ -12,7 +12,7 @@ import pygame
 from tkinter import Tk, Label, Button, filedialog
 from tkinter.ttk import Spinbox
 from tkinter.messagebox import askyesno
-from world import Tile, TILE_SIZE, Tiles as WorldTiles, load_world, convert_map_to_list
+from world import Tile, TILE_SIZE, Tiles as WorldTiles, load_map, convert_map_to_list
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 from os import system, remove

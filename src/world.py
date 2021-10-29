@@ -60,14 +60,16 @@ class Tiles:
 class World:
     """Handles all tiles in the world"""
 
-    def __init__(self, map_array: list[list], player_pos: tuple):
+    def __init__(self, map_array: list[list], player_pos: tuple, end_tile: tuple):
         self.map_array = map_array
         self.map_list = convert_map_to_list(map_array)
         self.player_pos = player_pos
+        self.end_tile = end_tile
 
     def draw_tiles(self):
         for tile in self.map_list:
             tile.draw()
+        self.end_tile.draw()
 
 
 ##################
@@ -115,6 +117,7 @@ def load_map(filepath) -> dict:
 
     map_array: list[Tile] = []
     player_pos = None
+    end_tile = None
     for row_idx, row in enumerate(map_file_str.split("\n")):
         map_array.append([])
         for tile_idx, tile in enumerate(row):
@@ -147,10 +150,12 @@ def load_map(filepath) -> dict:
 
             # Ending tile
             if int(tile) == 8:
-                Logger.warn(
-                    "Hey, there's an ending tile here, but there's nothing "
-                    "to handle it! Whoops, that sucks!"
+                end_tile = Tile(
+                    pos=tile_position,
+                    image_path=Tiles.tile_dict[tile]["filepath"],
+                    id=tile,
                 )
+                continue
 
             # Player position tile
             if int(tile) == 9:
@@ -167,7 +172,10 @@ def load_map(filepath) -> dict:
         Logger.warn("No player tile set, using default position")
         player_pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
 
-    return {"map_array": map_array, "player_pos": player_pos}
+    if end_tile is None:
+        Logger.warn("No exit location, player trapped inside level forever")
+
+    return {"map_array": map_array, "player_pos": player_pos, "end_tile": end_tile}
 
 
 def convert_map_to_list(map_array: list[list]) -> list:

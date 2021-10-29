@@ -15,7 +15,7 @@ from world import World, load_map, TILE_SIZE
 
 # Create world
 map_data = load_map(MAP_PATH)
-world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"])
+world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"], end_tile = map_data["end_tile"])
 
 # Create entities
 player = Player(world.player_pos)
