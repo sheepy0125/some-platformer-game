@@ -30,11 +30,7 @@ Scrolling.setup_scrolling(
     tile_size=TILE_SIZE,
     screen_size=SCREEN_SIZE
 )
-d = time()
 while True:
-    if time() - d > .165:
-        print(1/(time() - d))
-    d = time()
     # Event handling
 
 
