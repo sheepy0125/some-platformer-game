@@ -8,7 +8,7 @@ from pygame_setup import pygame, screen, SCREEN_SIZE, SCROLL_OFFSET
 from config_parser import FPS, GRAVITY
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World
-
+from sounds import play_sound
 from time import time
 
 
@@ -189,11 +189,21 @@ class Player(Entity):
         if self.collision_types["bottom"]:
             self.air_time = time()
 
+        # Other keys
+
+        # Reset
+        if keys[pygame.K_r]:
+            self.vx = self.vy = 0
+            self.rect.center = self.default_pos
+
+        # Movement
+
         # Jump
         if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and (
             self.collision_types["bottom"]
             or time() - self.air_time < self.air_time_grace_period
         ):
+            play_sound("jump")
             self.vy = -20
 
         # Right
@@ -206,10 +216,8 @@ class Player(Entity):
 
         else:
             self.target_speed = 0
+            return
 
-        # Other keys
-
-        # Reset
-        if keys[pygame.K_r]:
-            self.vx = self.vy = 0
-            self.rect.center = self.default_pos
+        # The player moved, handle sounds
+        if self.collision_types["bottom"]:
+            play_sound("step")
