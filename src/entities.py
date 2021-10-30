@@ -220,4 +220,4 @@ class Player(Entity):
 
         # The player moved, handle sounds
         if self.collision_types["bottom"]:
-            play_sound("step")
+            play_sound("grass_step")

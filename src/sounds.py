@@ -21,16 +21,12 @@ SOUND_PATH = ROOT_PATH / "assets" / "sfx"
 class Sounds:
     """Dataclass for storing sounds"""
 
-    # Note: the duration isn't needed but it is nice to have
     sound_dict = {
-        "jump": {"filename": str(SOUND_PATH / "jump.wav"), "duration": 0.19, "idx": 0},
-        "step": {"filename": str(SOUND_PATH / "step.wav"), "duration": 0.17, "idx": 1},
-        "damage": {
-            "filename": str(SOUND_PATH / "damage.wav"),
-            "duration": 2.8,
-            "idx": 2,
-        },
-        "death": {"filename": str(SOUND_PATH / "death.wav"), "duration": 0.4, "idx": 3},
+        "jump": {"filename": str(SOUND_PATH / "jump.wav"), "idx": 0},
+        "grass_step": {"filename": str(SOUND_PATH / "grass_step.wav"), "idx": 1},
+        "stone_step": {"filename": str(SOUND_PATH / "dirt_step.wav"), "idx": 2},
+        "damage": {"filename": str(SOUND_PATH / "damage.wav"), "idx": 3},
+        "death": {"filename": str(SOUND_PATH / "death.wav"), "idx": 4},
     }
 
 
