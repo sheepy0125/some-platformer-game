@@ -12,7 +12,6 @@ from config_parser import FPS, MAP_PATH
 from entities import Player, Entity
 from utils import Logger, Scrolling
 from world import World, load_map, TILE_SIZE
-
 from time import time
 
 # Create world
@@ -34,13 +33,9 @@ Scrolling.setup_scrolling(
     tile_size=TILE_SIZE,
     screen_size=SCREEN_SIZE,
 )
-d = time()
-while True:
-    if time() - d > 0.165:
-        print(1 / (time() - d))
-    d = time()
-    # Event handling
 
+while True:
+    # Event handling
     for event in pygame.event.get():
         # Exit
         if event.type == pygame.QUIT:
