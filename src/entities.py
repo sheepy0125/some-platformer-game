@@ -172,7 +172,7 @@ class Player(Entity):
         if self.target_speed == 0:
             self.vx += speed_dif / 6
         else:
-            self.vx += speed_dif / 8
+            self.vx += speed_dif / 10
 
         super().move(world)
         try:

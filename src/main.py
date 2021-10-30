@@ -30,7 +30,11 @@ Scrolling.setup_scrolling(
     tile_size=TILE_SIZE,
     screen_size=SCREEN_SIZE
 )
+d = time()
 while True:
+    if time() - d > .165:
+        print(1/(time() - d))
+    d = time()
     # Event handling
 
 
@@ -42,6 +46,7 @@ while True:
             exit(0)
 
     player.event_handler()
+
     player.move(world=world)
         # map_data = load_map(MAP_PATH)
         # world = World(map_array=map_data["map_array"], player_pos=map_data["player_pos"], end_tile = map_data["end_tile"])
