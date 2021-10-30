@@ -59,8 +59,12 @@ class Scrolling:
         Scrolling.max_scroll_x = (map_size[0] * tile_size) - (screen_size[0])
         Scrolling.max_scroll_y = (map_size[1] * tile_size) - (screen_size[1])
 
+        Logger.log(
+            f"Max scrolling: ({Scrolling.max_scroll_x}, {Scrolling.max_scroll_y})"
+        )
+
     @staticmethod
-    def update_scrolling(player_pos, screen_size, scroll_offset):
+    def update_scrolling(player_pos, scroll_offset):
         """Update scrolling"""
 
         # Center player
@@ -74,13 +78,13 @@ class Scrolling:
         # Don't allow scrolling off the map
 
         # X axis
-        if Scrolling.scroll_x < 0:
+        if Scrolling.scroll_x <= 0:
             Scrolling.scroll_x = 0
-        elif Scrolling.scroll_x > Scrolling.max_scroll_x:
+        elif Scrolling.scroll_x >= Scrolling.max_scroll_x:
             Scrolling.scroll_x = Scrolling.max_scroll_x
 
         # Y axis
-        if Scrolling.scroll_y < 0:
+        if Scrolling.scroll_y <= 0:
             Scrolling.scroll_y = 0
-        elif Scrolling.scroll_y > Scrolling.max_scroll_y:
+        elif Scrolling.scroll_y >= Scrolling.max_scroll_y:
             Scrolling.scroll_y = Scrolling.max_scroll_y

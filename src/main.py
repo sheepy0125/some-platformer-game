@@ -53,7 +53,7 @@ while True:
     player.move(world=world)
 
     # Scroll world
-    Scrolling.update_scrolling(player.rect.center, SCREEN_SIZE, SCROLL_OFFSET)
+    Scrolling.update_scrolling(player.rect.center, SCROLL_OFFSET)
 
     # Draw
     screen.fill("blue")
