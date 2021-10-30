@@ -9,10 +9,10 @@ Created by duuuuck and sheepy0125
 #############
 # Import
 import pygame
-from tkinter import Tk, Label, Button, filedialog
+from tkinter import Tk, Label, Button, filedialog, IntVar, Checkbutton
 from tkinter.ttk import Spinbox
 from tkinter.messagebox import askyesno
-from world import Tile, TILE_SIZE, Tiles as WorldTiles, load_map, convert_map_to_list
+from world import Tile, Tiles as WorldTiles, load_map, TILE_SIZE
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 from os import system, remove
@@ -46,6 +46,7 @@ class MapSize:
     """Dataclass for map size"""
 
     size = (0, 0)
+    resizable = False
 
 
 class Tiles:
@@ -141,6 +142,36 @@ class TileMap:
         ):
             Logger.log(f"Row {row_idx:3d}: {row}")
 
+    @staticmethod
+    def resize_map(new_size: tuple) -> None:
+        """Resizes the map"""
+
+        new_map = TileMap.tile_map
+
+        # Resize columns
+        # If the new size is smaller than the current size, we need to remove
+        if new_size[0] < MapSize.size[0]:
+            for row in new_map:
+                for _ in range(MapSize.size[0] - new_size[0]):
+                    row.pop()
+
+        elif new_size[0] > MapSize.size[0]:
+            for row in new_map:
+                row.extend([None] * (new_size[0] - len(row)))
+
+        # Resize rows
+        # If the new size is smaller than the current size, we need to remove
+        if new_size[1] < MapSize.size[1]:
+            for _ in range(MapSize.size[1] - new_size[1]):
+                new_map.pop()
+
+        # If the new size is bigger than the current size, we need to add
+        elif new_size[1] > MapSize.size[1]:
+            for _ in range(new_size[1] - MapSize.size[1]):
+                new_map.append([None for _ in range(new_size[0])])
+
+        TileMap.tile_map = new_map
+
 
 class Sidebar:
     def __init__(self):
@@ -156,6 +187,7 @@ class Sidebar:
             self.create_text("Map Maker!"),
             self.create_text("LMB: Place, RMB: Destroy"),
             self.create_text("Press the arrow keys to scroll"),
+            self.create_text("Press Z to resize the map"),
             self.create_text("Press R to reset"),
             self.create_text("Press E to export"),
             self.create_text("Press I to import"),
@@ -255,7 +287,6 @@ class Sidebar:
         )
 
     def create_size_text(self):
-        print(MapSize.size)
         self.size_text = self.create_text(
             f"{MapSize.size[0]}x{MapSize.size[1]}",
             pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - self.spacing),
@@ -408,6 +439,49 @@ def destroy_tile(mouse_pos):
     Tiles.tile_dict[str(tile_id)]["amount"] -= 1
 
 
+def resize_map():
+    """Resizes the map"""
+
+    if not MapSize.resizable:
+        raise ValueError("The map isn't resizable!")
+        return
+
+    # TODO: Use Tkinter instead
+    # FIXME: Update total tiles
+
+    # Get the new map size
+    new_size = (
+        int(input("Enter the new map  width: ")),
+        int(input("Enter the new map height: ")),
+    )
+
+    # Make sure the new size is valid
+    if new_size[0] < 12 or new_size[1] < 16:
+        raise ValueError("The new size selected is too small!")
+        return
+
+    elif new_size[0] < MapSize.size[0] or new_size[1] < MapSize.size[1]:
+        Logger.warn("The new size selected is smaller than the current size!")
+        if not confirm_dialog(
+            "Resize map",
+            "Are you sure you want to resize the map? " "This will crop the map!",
+        ):
+            raise ValueError("Resize aborted")
+            return
+
+    TileMap.resize_map(new_size)
+
+    # Update other stuff
+    MapSize.size = new_size
+    set_max_scrolling()
+    Scrolling.scroll_x = 0
+    sidebar.create_scroll_text()
+    sidebar.create_total_tiles_text()
+    sidebar.create_size_text()
+
+    Logger.log("Successfully resized map")
+
+
 def import_map(filepath: str = None):
     """Imports a map"""
 
@@ -486,6 +560,7 @@ def map_setup() -> tuple:
             return
 
         MapSize.size = (int(width), int(height))
+        MapSize.resizable = bool(resizable)
 
     root = Tk()
     root.geometry("300x200")
@@ -496,16 +571,19 @@ def map_setup() -> tuple:
     width_spinbox = Spinbox(
         root, from_=round((SCREEN_SIZE[0] - SIDEBAR_SIZE[0]) / TILE_SIZE), to=500
     )
-    height_spinbox = Spinbox(
-        root, from_=round(SCREEN_SIZE[1] // TILE_SIZE), to=500
-    )  # TODO: scrolling vertically instead of fixed
+    height_spinbox = Spinbox(root, from_=round(SCREEN_SIZE[1] // TILE_SIZE), to=500)
+
+    resizable = IntVar()
+    resizable.set(0)
+    resizable_checkbox = Checkbutton(
+        root, text="Resizable", variable=resizable, onvalue=1, offvalue=0
+    )
 
     Label(root, text="Width").pack(pady=2)
     width_spinbox.pack(pady=2)
     Label(root, text="Height").pack(pady=2)
-    height_spinbox.pack(
-        pady=2,
-    )
+    height_spinbox.pack(pady=2)
+    resizable_checkbox.pack(pady=2)
 
     Button(root, text="Go!", command=save_variables).pack(pady=2)
 
@@ -535,8 +613,16 @@ def main():
 
             # Keypress
             if event.type == pygame.KEYUP:
+                # Resize map
+                if event.key == pygame.K_x:
+                    try:
+                        resize_map()
+                    except Exception as error:
+                        Logger.fatal("Failed to resize map")
+                        Logger.log_error(error)
+
                 # Reset map
-                if event.key == pygame.K_r:
+                elif event.key == pygame.K_r:
                     # Confirm
                     if ConfirmDialogBoxConfig.confirm_reset and (
                         not confirm_dialog(
