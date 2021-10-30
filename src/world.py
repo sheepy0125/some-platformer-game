@@ -7,6 +7,7 @@ Source: https://youtu.be/abH2MSBdnWc
 
 from pygame_setup import pygame, screen, SCREEN_SIZE
 from utils import Logger, Scrolling, ROOT_PATH
+from typing import Union
 
 MAP_HEIGHT = 10
 TILE_SIZE = 50
@@ -60,19 +61,35 @@ class Tiles:
 class World:
     """Handles all tiles in the world"""
 
-    def __init__(self, map_array: list[list], player_pos: tuple, end_tile: tuple):
+    def __init__(
+        self, map_array: list[list], player_pos: tuple, end_tile_pos: Union[tuple, None]
+    ):
         self.map_array = map_array
         self.map_list = convert_map_to_list(map_array)
         self.player_pos = player_pos
-        self.end_tile = end_tile
+        # Create end tile
+        self.end_tile = (
+            (
+                Tile(
+                    pos=end_tile_pos,
+                    image_path=Tiles.tile_dict["8"]["filepath"],
+                    id=8,
+                )
+            )
+            if end_tile_pos is not None
+            else None
+        )
+
+    def end_level(self):
+        Logger.log("The player has touched the end of the level, oh well")
 
     def draw_tiles(self):
         for tile in self.map_list:
             tile.draw()
-        try:
+
+        if self.end_tile is not None:
             self.end_tile.draw()
-        except AttributeError:
-            pass
+
 
 ##################
 ### Tile class ###
@@ -96,11 +113,19 @@ class Tile:
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
     def draw(self):
-        if self.x - Scrolling.scroll_x < SCREEN_SIZE[0] and self.x + TILE_SIZE - Scrolling.scroll_x > 0:
-            if self.y - Scrolling.scroll_y < SCREEN_SIZE[1] and self.y + TILE_SIZE - Scrolling.scroll_y > 0:
+        if (
+            self.x - Scrolling.scroll_x < SCREEN_SIZE[0]
+            and self.x + TILE_SIZE - Scrolling.scroll_x > 0
+        ):
+            if (
+                self.y - Scrolling.scroll_y < SCREEN_SIZE[1]
+                and self.y + TILE_SIZE - Scrolling.scroll_y > 0
+            ):
                 screen.blit(
-                    self.surface, (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y)
+                    self.surface,
+                    (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y),
                 )
+
 
 ##################
 ### Map loader ###
@@ -120,7 +145,7 @@ def load_map(filepath) -> dict:
 
     map_array: list[Tile] = []
     player_pos = None
-    end_tile = None
+    end_tile_pos = None
     for row_idx, row in enumerate(map_file_str.split("\n")):
         map_array.append([])
         for tile_idx, tile in enumerate(row):
@@ -153,11 +178,7 @@ def load_map(filepath) -> dict:
 
             # Ending tile
             if int(tile) == 8:
-                end_tile = Tile(
-                    pos=tile_position,
-                    image_path=Tiles.tile_dict[tile]["filepath"],
-                    id=tile,
-                )
+                end_tile_pos = tile_position
                 continue
 
             # Player position tile
@@ -175,10 +196,10 @@ def load_map(filepath) -> dict:
         Logger.warn("No player tile set, using default position")
         player_pos = (SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2)
 
-    if end_tile is None:
+    if end_tile_pos is None:
         Logger.warn("No exit location, player trapped inside level forever")
 
-    return {"map_array": map_array, "player_pos": player_pos, "end_tile": end_tile}
+    return {"map_array": map_array, "player_pos": player_pos, "end_tile": end_tile_pos}
 
 
 def convert_map_to_list(map_array: list[list]) -> list:

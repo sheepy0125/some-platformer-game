@@ -175,10 +175,12 @@ class Player(Entity):
             self.vx += speed_dif / 8
 
         super().move(world)
-        try:
-            return world.end_tile.rect.colliderect(self.rect) #kill me now
-        except AttributeError:
-            return False
+
+        # Check if collided with the ending tile
+        if world.end_tile is not None:
+            # Check collision
+            if self.rect.colliderect(world.end_tile.rect):
+                world.end_level()
 
     def event_handler(self):
         keys: dict = pygame.key.get_pressed()
