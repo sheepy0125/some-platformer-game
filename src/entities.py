@@ -43,6 +43,12 @@ class Entity:
     def create(self):
         self.surface = pygame.image.load(self.image_path).convert_alpha()
         self.surface = pygame.transform.scale(self.surface, self.size)
+        self.fall_surf = pygame.transform.scale(
+            self.surface, (self.size[0] - 6, self.size[1] + 6)
+        )
+        self.land_surf = pygame.transform.scale(
+            self.surface, (self.size[0] + 10, self.size[1] - 10)
+        )
         self.rect = self.surface.get_rect(center=self.default_pos)
 
     def get_tile_collisions(self, tile_rects: list):
@@ -127,17 +133,13 @@ class Entity:
 
         # Stretching
         if not self.collision_types["bottom"]:
-            surface = pygame.transform.scale(
-                surface, (self.size[0] - 6, self.size[1] + 6)
-            )
+            surface = self.fall_surf
             draw_x += 3
             draw_y -= 3
 
         # Squashing
         elif time() - self.land_time < 0.1:
-            surface = pygame.transform.scale(
-                surface, (self.size[0] + 10, self.size[1] - 10)
-            )
+            surface = self.land_surf
             draw_x -= 5
             draw_y += 10
 

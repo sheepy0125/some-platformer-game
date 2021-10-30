@@ -16,6 +16,7 @@ from world import Tile, TILE_SIZE, Tiles as WorldTiles, load_map, convert_map_to
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 from os import system, remove
+from os.path import realpath
 
 SCREEN_SIZE = (800, 800)
 SIDEBAR_SIZE = (200, 800)
@@ -39,6 +40,12 @@ class ConfirmDialogBoxConfig:
     confirm_exit = True  # Confirm exiting the program
     confirm_reset = True  # Confirm resetting the map
     confirm_run = False  # Confirm test running map
+
+
+class MapSize:
+    """Dataclass for map size"""
+
+    size = (0, 0)
 
 
 class Tiles:
@@ -69,6 +76,11 @@ class Tiles:
         # Get the new tile ID from the dictionary keys
         # We need to do this because tile indeces are not (always) sequential
         tile_keys = list(Tiles.tile_dict.keys())
+        # Don't allow special tiles to be selected
+        for tile_idx, tile in enumerate(tile_keys):
+            if tile.startswith("_"):
+                tile_keys.pop(tile_idx)
+
         current_tile_index = tile_keys.index(str(Tiles.current_tile))
         # Find the index of the new tile
         if next_tile:
@@ -92,12 +104,12 @@ class TileMap:
     tile_map = []
 
     @staticmethod
-    def create_tile_2d_array(map_size: tuple) -> list[list]:
+    def create_tile_2d_array() -> list[list]:
         tile_map = []
         # Rows
-        for _ in range(map_size[1]):
+        for _ in range(MapSize.size[1]):
             # Create list of zeros
-            tile_map.append([None for _ in range(map_size[0])])
+            tile_map.append([None for _ in range(MapSize.size[0])])
 
         TileMap.tile_map = tile_map
         Logger.log("Created tile map")
@@ -158,10 +170,6 @@ class Sidebar:
                     (self.text_idx * self.spacing) + self.image_size,
                 ),
             ),
-            self.create_text(
-                f"{MapSize.size[0]}x{MapSize.size[1]}",
-                pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - self.spacing),
-            ),
         ]
         self.create_current_tile_widgets()
         self.create_total_tiles_text()
@@ -171,6 +179,12 @@ class Sidebar:
         self.available_tile_texts = []
         for tile_idx, (tile_id, available_tile) in enumerate(Tiles.tile_dict.items()):
             # Please note: tile_id is a string, not an int
+
+            # Don't allow special tiles to be selected
+            if tile_id.startswith("_"):
+                tile_idx -= 1
+                continue
+
             self.available_tile_texts.append(
                 self.create_text(
                     f"Tile {tile_id}: {available_tile['name']}",
@@ -240,6 +254,14 @@ class Sidebar:
             update_idx=False,
         )
 
+    def create_size_text(self):
+        print(MapSize.size)
+        self.size_text = self.create_text(
+            f"{MapSize.size[0]}x{MapSize.size[1]}",
+            pos=(SIDEBAR_SIZE[0] // 2, SIDEBAR_SIZE[1] - self.spacing),
+            update_idx=False,
+        )
+
     def draw(self):
         pygame.draw.rect(screen, rect=self.background_rect, color="black")
         for text in self.texts:
@@ -249,7 +271,11 @@ class Sidebar:
         self.currently_scrolling_text.draw()
         self.current_tile_text.draw()
         self.total_tiles_text.draw()
+        self.size_text.draw()
         screen.blit(self.current_tile_image, self.current_tile_image_rect)
+
+
+sidebar = Sidebar()
 
 
 #################
@@ -287,7 +313,7 @@ def run_map():
     """Run the map"""
 
     # Save the map in a temporary file
-    export(TEMP_MAP_FILEPATH)
+    export_map(TEMP_MAP_FILEPATH)
 
     # Open main.py with the temp map file as the argument
     system(f"python3 {(ROOT_PATH / 'src' / 'main.py')!s} {TEMP_MAP_FILEPATH}")
@@ -296,11 +322,17 @@ def run_map():
     remove(TEMP_MAP_FILEPATH)
 
 
+def set_max_scrolling():
+    Scrolling.max_scroll_x = (MapSize.size[0] * TILE_SIZE) - (
+        (SCREEN_SIZE[0] - SIDEBAR_SIZE[0]) // TILE_SIZE
+    ) * TILE_SIZE
+    Scrolling.max_scroll_y = (MapSize.size[1] * TILE_SIZE) - (SCREEN_SIZE[1])
+    Scrolling.scroll_y = Scrolling.max_scroll_y
+
+
 ###########################
 ### Map maker functions ###
 ###########################
-
-
 def snap_to_grid(mouse_pos: tuple) -> tuple:
     """Returns the top left coordinate of a tile from a mouse position"""
 
@@ -330,11 +362,10 @@ def get_tile_idx(tile_location: tuple) -> tuple:
 
 
 def tile_exists(tile_idx: tuple):
-
     return TileMap.tile_map[tile_idx[1]][tile_idx[0]] is not None
 
 
-def create_tile(mouse_pos):
+def create_tile(mouse_pos: tuple):
     tile_pos = snap_to_grid(mouse_pos)
     tile_idx = get_tile_idx(tile_pos)
     if tile_exists(tile_idx):
@@ -377,7 +408,45 @@ def destroy_tile(mouse_pos):
     Tiles.tile_dict[str(tile_id)]["amount"] -= 1
 
 
-def export(filepath=None):
+def import_map(filepath: str = None):
+    """Imports a map"""
+
+    if filepath is None:
+        # Get filepath to import from
+        Tk().withdraw()
+        filepath = realpath(filedialog.askopenfile().name)
+
+    Logger.log(f"Importing map from {filepath}")
+
+    # Set scroll x to 200. I don't know why this works, but it does.
+    Scrolling.scroll_x = 200
+
+    # Create tile map array
+    tile_map_array = load_map(filepath)["map_array"]
+    MapSize.size = (len(tile_map_array[0]), len(tile_map_array))
+    TileMap.create_tile_2d_array()
+
+    # Iterate through each tile in the map and update number of tiles
+    for row in tile_map_array:
+        for tile in row:
+            # Assert tile is not NoneType
+            if tile is None:
+                continue
+
+            Tiles.current_tile = tile.id
+            create_tile(tile.rect.center)
+
+    # Update other things
+    Scrolling.scroll_x = 0
+    set_max_scrolling()
+    sidebar.create_scroll_text()
+    sidebar.create_total_tiles_text()
+    sidebar.create_size_text()
+
+    Logger.log("Successfully loaded map")
+
+
+def export_map(filepath: str = None):
     """Save tile to a file"""
 
     map_string = TileMap.convert_array_to_string()
@@ -400,10 +469,6 @@ def export(filepath=None):
 #################
 ### Map setup ###
 #################
-class MapSize:
-    size = (0, 0)
-
-
 def map_setup() -> tuple:
     def save_variables() -> int:
         try:
@@ -454,16 +519,13 @@ def map_setup() -> tuple:
 ### Main ###
 ############
 def main():
-    map_size = map_setup()
-    max_scroll_x = (map_size[0] * TILE_SIZE) - (
-        (SCREEN_SIZE[0] - SIDEBAR_SIZE[0]) // TILE_SIZE
-    ) * TILE_SIZE
-    max_scroll_y = (map_size[1] * TILE_SIZE) - (SCREEN_SIZE[1])
-    Scrolling.scroll_y = max_scroll_y
+    # Setup
+    map_setup()
+    set_max_scrolling()
+    sidebar.create_size_text()
+    TileMap.create_tile_2d_array()
 
-    sidebar = Sidebar()
-    TileMap.create_tile_2d_array(map_size)
-
+    # Main loop
     while True:
         # Event handler
         for event in pygame.event.get():
@@ -480,12 +542,13 @@ def main():
                         not confirm_dialog(
                             "Resetting map",
                             "Are you SURE you want to reset the map? "
-                            "(to disable this message, go into map_maker.py and set confirm_reset to False)",
+                            "(to disable this message, go into map_maker.py "
+                            "and set confirm_reset to False)",
                         )
                     ):
                         break
                     # Reset tile map
-                    TileMap.create_tile_2d_array(map_size)
+                    TileMap.create_tile_2d_array()
                     Tiles.total_tiles = 0
                     for tile_id in Tiles.tile_dict:
                         Tiles.tile_dict[tile_id]["amount"] = 0
@@ -503,7 +566,8 @@ def main():
                         not confirm_dialog(
                             "Running map",
                             "Are you SURE you want to run the map? "
-                            "(to disable this message, go into map_maker.py and set confirm_run to False)",
+                            "(to disable this message, go into map_maker.py and "
+                            "set confirm_run to False)",
                         )
                     ):
                         break
@@ -518,9 +582,17 @@ def main():
                 # Export
                 elif event.key == pygame.K_e:
                     try:
-                        export()
+                        export_map()
                     except Exception as error:
                         Logger.fatal("Failed to export map")
+                        Logger.log_error(error)
+
+                # Import
+                elif event.key == pygame.K_i:
+                    try:
+                        import_map()
+                    except Exception as error:
+                        Logger.fatal("Failed to import map")
                         Logger.log_error(error)
 
                 # Tile switching
@@ -545,7 +617,7 @@ def main():
 
                 # Scroll screen to the right
                 if event.key == pygame.K_RIGHT:
-                    if Scrolling.scroll_x < max_scroll_x:
+                    if Scrolling.scroll_x < Scrolling.max_scroll_x:
                         Scrolling.scroll_x += TILE_SIZE
 
                 # Scroll screen to the left
@@ -560,7 +632,7 @@ def main():
 
                 # Scroll screen down
                 elif event.key == pygame.K_DOWN:
-                    if Scrolling.scroll_y < max_scroll_y:
+                    if Scrolling.scroll_y < Scrolling.max_scroll_y:
                         Scrolling.scroll_y += TILE_SIZE
 
                 # Not scrolling
