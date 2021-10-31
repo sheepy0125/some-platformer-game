@@ -6,7 +6,7 @@ Created by duuuuck and sheepy0125
 #############
 ### Setup ###
 #############
-
+# Import
 from pygame_setup import pygame, screen, clock, SCROLL_OFFSET, SCREEN_SIZE
 from config_parser import FPS, MAP_PATH
 from entities import Player, Entity
@@ -29,7 +29,7 @@ entities: list[Entity] = []
 
 # Setup scrolling
 Scrolling.setup_scrolling(
-    map_size=(len(world.map_array), len(world.map_array[0])),
+    map_size=(len(world.map_array[0]), len(world.map_array)),
     tile_size=TILE_SIZE,
     screen_size=SCREEN_SIZE,
 )

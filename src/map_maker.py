@@ -360,6 +360,10 @@ def set_max_scrolling():
     Scrolling.max_scroll_y = (MapSize.size[1] * TILE_SIZE) - (SCREEN_SIZE[1])
     Scrolling.scroll_y = Scrolling.max_scroll_y
 
+    Logger.log(
+        f"Set up max scrolling at {Scrolling.max_scroll_x} and {Scrolling.max_scroll_y}"
+    )
+
 
 ###########################
 ### Map maker functions ###
@@ -746,7 +750,7 @@ def main():
         for tile_row in TileMap.tile_map:  # 2D Array, so both row and tile
             for tile in tile_row:
                 if tile is not None:
-                    tile.draw()
+                    tile.draw(optimize=False)
 
         sidebar.draw()
 

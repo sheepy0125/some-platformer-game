@@ -57,7 +57,7 @@ class Scrolling:
         """Setup scrolling"""
 
         Scrolling.max_scroll_x = (map_size[0] * tile_size) - (screen_size[0])
-        Scrolling.max_scroll_y = (map_size[1] * tile_size) - (screen_size[1])
+        Scrolling.max_scroll_y = (map_size[1] * tile_size) - (screen_size[1]) - 50
 
         Logger.log(
             f"Max scrolling: ({Scrolling.max_scroll_x}, {Scrolling.max_scroll_y})"
