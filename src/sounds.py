@@ -59,7 +59,8 @@ def play_sound(sound_name: str):
         Logger.fatal(f"Sound {sound_name} not found, cannot play")
     except RuntimeError:
         # This occurs when the sound is already being played.
-        Logger.log("Attempted to play sound, but the sound is already playing")
+        # Logger.log("Attempted to play sound, but the sound is already playing")
+        pass
     except Exception as error:
         Logger.fatal("Sound was found, but another error occurred")
         Logger.log_error(error)

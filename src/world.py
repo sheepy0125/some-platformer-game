@@ -74,7 +74,7 @@ class World:
             else None
         )
 
-    def get_tile_collisions_new(self, player_rect: pygame.Rect) -> list:
+    def get_tile_collisions(self, player_rect: pygame.Rect) -> list:
         # Get the tiles around the player (there should be 8 maximum!)
         # Use the 2d tile array and the player position snapped to tile index grid to
         # find the tiles around the player
@@ -97,19 +97,12 @@ class World:
                             player_pos_array_idx[0] + x_offset
                         ]
                     )
-                    Logger.log(
-                        "Added nearest neighbor tile at "
-                        f"({player_pos_array_idx[0] + y_offset},"
-                        f"{player_pos_array_idx[1] + x_offset})"
-                    )
                 except IndexError:
                     """
                     An IndexError occurs when the player is near or
                     outside of the border, it's nothing to worry about
                     """
                     pass
-
-        Logger.log(f"The player index is {player_pos_array_idx}")
 
         # Check collisions for all of those tiles
         for tile in nearest_neighbour_tiles:
@@ -118,17 +111,9 @@ class World:
                 continue
 
             if tile.rect.colliderect(player_rect):
-                Logger.log(f"Collision with tile {tile.id}")
                 collided_tiles.append(tile)
 
         return collided_tiles
-
-    def get_tile_collisions_old(self, player_rect) -> list:
-        return [
-            tile_rect
-            for tile_rect in self.map_list
-            if player_rect.colliderect(tile_rect)
-        ]
 
     def end_level(self):
         Logger.log("The player has touched the end of the level, oh well")
@@ -283,11 +268,5 @@ def get_tile_idx(tile_location: tuple, map_size: tuple) -> tuple:
         int((tile_location[0]) // TILE_SIZE),
         int((tile_location[1]) // TILE_SIZE),
     )
-
-    # Assert tile is in bounds
-    if ((tile_idx[0] < 0) or (tile_idx[0] >= map_size[0])) or (
-        (tile_idx[1] < 0) or (tile_idx[1] >= map_size[1])
-    ):
-        Logger.fatal(f"Tile is out of bounds ({tile_idx})!")
 
     return tile_idx
