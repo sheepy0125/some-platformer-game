@@ -122,8 +122,12 @@ class World:
     def handle_walk_sound(self, player_idx: tuple):
         """Handles the walking sound for the player"""
 
-        # Get the tile the player is standing on
-        player_tile = self.map_array[player_idx[1] + 2][player_idx[0]]
+        try:
+            # Get the tile the player is standing on
+            player_tile = self.map_array[player_idx[1] + 2][player_idx[0]]
+
+        except IndexError:
+            return
 
         # If the tile is not air, play the walking sound
         if player_tile is not None:
@@ -161,19 +165,23 @@ class Tile:
         self.surface = pygame.transform.scale(self.surface, (TILE_SIZE, TILE_SIZE))
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
-    def draw(self):
-        if (
-            self.x - Scrolling.scroll_x < SCREEN_SIZE[0]
-            and self.x + TILE_SIZE - Scrolling.scroll_x > 0
-        ):
+    def draw(self, optimize: bool = True):
+        if optimize:
             if (
-                self.y - Scrolling.scroll_y < SCREEN_SIZE[1]
-                and self.y + TILE_SIZE - Scrolling.scroll_y > 0
+                self.x - Scrolling.scroll_x < SCREEN_SIZE[0]
+                and self.x + TILE_SIZE - Scrolling.scroll_x > 0
             ):
-                screen.blit(
-                    self.surface,
-                    (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y),
-                )
+                if (
+                    self.y - Scrolling.scroll_y < SCREEN_SIZE[1]
+                    and self.y + TILE_SIZE - Scrolling.scroll_y > 0
+                ):
+                    screen.blit(
+                        self.surface,
+                        (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y),
+                    )
+            return
+
+        screen.blit(self.surface, self.rect)
 
 
 #################
