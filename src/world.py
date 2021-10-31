@@ -69,16 +69,66 @@ class World:
         self.player_pos = player_pos
         # Create end tile
         self.end_tile = (
-            (
-                Tile(
-                    pos=end_tile_pos,
-                    image_path=Tiles.tile_dict["8"]["filepath"],
-                    id=8,
-                )
-            )
+            (Tile(pos=end_tile_pos, image_path=Tiles.tile_dict["8"]["filepath"], id=8))
             if end_tile_pos is not None
             else None
         )
+
+    def get_tile_collisions_new(self, player_rect: pygame.Rect) -> list:
+        # Get the tiles around the player (there should be 8 maximum!)
+        # Use the 2d tile array and the player position snapped to tile index grid to
+        # find the tiles around the player
+        # Then check collisions for all of those tiles
+
+        collided_tiles = []
+        nearest_neighbour_tiles = []
+        player_pos_snapped_to_grid = snap_to_grid(player_rect.center)
+        player_pos_array_idx = get_tile_idx(
+            player_pos_snapped_to_grid,
+            map_size=(len(self.map_array[1]), len(self.map_array)),
+        )
+
+        # Get the tiles around the player
+        for y_offset in range(-1, 3):  # Above, at top, at bottom, below
+            for x_offset in range(-1, 2):  # Left, at, right
+                try:
+                    nearest_neighbour_tiles.append(
+                        self.map_array[player_pos_array_idx[1] + y_offset][
+                            player_pos_array_idx[0] + x_offset
+                        ]
+                    )
+                    Logger.log(
+                        "Added nearest neighbor tile at "
+                        f"({player_pos_array_idx[0] + y_offset},"
+                        f"{player_pos_array_idx[1] + x_offset})"
+                    )
+                except IndexError:
+                    """
+                    An IndexError occurs when the player is near or
+                    outside of the border, it's nothing to worry about
+                    """
+                    pass
+
+        Logger.log(f"The player index is {player_pos_array_idx}")
+
+        # Check collisions for all of those tiles
+        for tile in nearest_neighbour_tiles:
+            # Assert the tile is not NoneType (air)
+            if tile is None:
+                continue
+
+            if tile.rect.colliderect(player_rect):
+                Logger.log(f"Collision with tile {tile.id}")
+                collided_tiles.append(tile)
+
+        return collided_tiles
+
+    def get_tile_collisions_old(self, player_rect) -> list:
+        return [
+            tile_rect
+            for tile_rect in self.map_list
+            if player_rect.colliderect(tile_rect)
+        ]
 
     def end_level(self):
         Logger.log("The player has touched the end of the level, oh well")
@@ -127,9 +177,9 @@ class Tile:
                 )
 
 
-##################
-### Map loader ###
-##################
+#################
+### Functions ###
+#################
 def load_map(filepath) -> dict:
     """Returns a 2D array of Tiles"""
 
@@ -211,6 +261,33 @@ def convert_map_to_list(map_array: list[list]) -> list:
             # Assert the tile is not NoneType
             if tile is None:
                 continue
-
             return_list.append(tile)
+
     return return_list
+
+
+def snap_to_grid(mouse_pos: tuple) -> tuple:
+    """Returns the top left coordinate of a tile from a mouse position"""
+
+    return tuple([(int(mouse_pos[i] / TILE_SIZE) * TILE_SIZE) for i in range(2)])
+
+
+def get_tile_idx(tile_location: tuple, map_size: tuple) -> tuple:
+    """
+    Get the tile indecies of a tile location (top left)
+    Returns a tuple with the first index being the row index and the
+    second index being the column index (it's a 2D map)
+    """
+
+    tile_idx = (
+        int((tile_location[0]) // TILE_SIZE),
+        int((tile_location[1]) // TILE_SIZE),
+    )
+
+    # Assert tile is in bounds
+    if ((tile_idx[0] < 0) or (tile_idx[0] >= map_size[0])) or (
+        (tile_idx[1] < 0) or (tile_idx[1] >= map_size[1])
+    ):
+        Logger.fatal(f"Tile is out of bounds ({tile_idx})!")
+
+    return tile_idx

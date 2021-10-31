@@ -12,7 +12,7 @@ import pygame
 from tkinter import Tk, Label, Button, filedialog, IntVar, Checkbutton
 from tkinter.ttk import Spinbox
 from tkinter.messagebox import askyesno
-from world import Tile, Tiles as WorldTiles, load_map, TILE_SIZE
+from world import Tile, Tiles as WorldTiles, load_map, snap_to_grid, TILE_SIZE
 from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 from os import system, remove
@@ -364,17 +364,14 @@ def set_max_scrolling():
 ###########################
 ### Map maker functions ###
 ###########################
-def snap_to_grid(mouse_pos: tuple) -> tuple:
-    """Returns the top left coordinate of a tile from a mouse position"""
-
-    return tuple([(int(mouse_pos[i] / TILE_SIZE) * TILE_SIZE) for i in range(2)])
-
-
 def get_tile_idx(tile_location: tuple) -> tuple:
     """
     Get the tile indecies of a tile location (top left)
     Returns a tuple with the first index being the row index and the
     second index being the column index (it's a 2D map)
+
+    While this is pretty much a carbon copy of what is in world.py,
+    we need to do a couple of things to make it work for the map maker
     """
 
     tile_idx = (

@@ -51,10 +51,23 @@ class Entity:
         )
         self.rect = self.surface.get_rect(center=self.default_pos)
 
-    def get_tile_collisions(self, tile_rects: list):
-        return [
-            tile_rect for tile_rect in tile_rects if self.rect.colliderect(tile_rect)
-        ]
+    def get_collisions(self, world: World):
+        """Get collisions with timing"""
+        start_time = time()
+        collisions = world.get_tile_collisions_new(self.rect)
+        end_time = time()
+        Logger.log(
+            f"Getting collisions with the new way took {end_time - start_time} seocnds"
+        )
+
+        start_time = time()
+        collisions = world.get_tile_collisions_old(self.rect)
+        end_time = time()
+        Logger.log(
+            f"Getting collisions with the old way took {end_time - start_time} seocnds"
+        )
+
+        return collisions
 
     def move(self, world: World):
 
@@ -78,7 +91,8 @@ class Entity:
         self.rect.x += round(self.vx)
 
         # Check horizontal collision
-        collision_list = self.get_tile_collisions(world.map_list)
+        collision_list = self.get_collisions(world)
+        # collision_list = world.get_tile_collisions_new(self.rect)
         for tile in collision_list:
             # Moving right
             if self.vx > 0:
@@ -103,7 +117,7 @@ class Entity:
         self.rect.y += self.vy
 
         # Check vertical collision
-        collision_list = self.get_tile_collisions(world.map_list)
+        collision_list = world.get_tile_collisions_new(self.rect)
         for tile in collision_list:
             # Moving up
             if self.vy < 0:
@@ -220,4 +234,5 @@ class Player(Entity):
 
         # The player moved, handle sounds
         if self.collision_types["bottom"]:
+            # TODO - Detect what is below the player
             play_sound("grass_step")
