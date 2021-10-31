@@ -62,5 +62,23 @@ def play_sound(sound_name: str):
         # Logger.log("Attempted to play sound, but the sound is already playing")
         pass
     except Exception as error:
-        Logger.fatal("Sound was found, but another error occurred")
+        Logger.fatal(
+            "Error in playing sound: Sound was found, but another error occurred"
+        )
+        Logger.log_error(error)
+
+
+##################
+### Stop sound ###
+##################
+def stop_sound(sound_name: str):
+    try:
+        sound_idx = Sounds.sound_dict[sound_name]["idx"]
+        channels[sound_idx].stop()
+    except KeyError:
+        Logger.fatal(f"Sound {sound_name} not found, cannot stop")
+    except Exception as error:
+        Logger.fatal(
+            "Error in stopping sound: Sound was found, but another error occurred"
+        )
         Logger.log_error(error)

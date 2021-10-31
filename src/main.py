@@ -10,9 +10,9 @@ Created by duuuuck and sheepy0125
 from pygame_setup import pygame, screen, clock, SCROLL_OFFSET, SCREEN_SIZE
 from config_parser import FPS, MAP_PATH
 from entities import Player, Entity
+from sounds import stop_sound
 from utils import Logger, Scrolling
-from world import World, load_map, TILE_SIZE
-from time import time
+from world import World, load_map, get_tile_idx, snap_to_grid, TILE_SIZE
 
 # Create world
 map_data = load_map(MAP_PATH)
@@ -44,8 +44,18 @@ while True:
             exit(0)
 
     player.event_handler()
-
     player.move(world=world)
+    # Handle sounds
+    if player.collision_types["bottom"] and abs(player.vx) > 0.1:
+        world.handle_walk_sound(
+            player_idx=get_tile_idx(
+                snap_to_grid(player.rect.center),
+                map_size=(len(world.map_array[0]), len(world.map_array)),
+            )
+        )
+    else:
+        stop_sound("grass_step")
+        stop_sound("stone_step")
 
     # Scroll world
     Scrolling.update_scrolling(player.rect.center, SCROLL_OFFSET)

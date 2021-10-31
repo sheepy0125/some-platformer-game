@@ -6,6 +6,7 @@ Source: https://youtu.be/abH2MSBdnWc
 """
 
 from pygame_setup import pygame, screen, SCREEN_SIZE
+from sounds import play_sound
 from utils import Logger, Scrolling, ROOT_PATH
 from typing import Union
 
@@ -25,16 +26,19 @@ class Tiles:
         "1": {
             "filepath": str(TILE_IMAGE_FOLDER / "grass.png"),
             "name": "grass",
+            "sound_name": "grass_step",
             "max_amount": -1,
         },
         "2": {
             "filepath": str(TILE_IMAGE_FOLDER / "dirt.png"),
             "name": "dirt",
+            "sound_name": "grass_step",
             "max_amount": -1,
         },
         "3": {
             "filepath": str(TILE_IMAGE_FOLDER / "stone.png"),
             "name": "stone",
+            "sound_name": "grass_step",
             "max_amount": -1,
         },
         "8": {
@@ -114,6 +118,16 @@ class World:
                 collided_tiles.append(tile)
 
         return collided_tiles
+
+    def handle_walk_sound(self, player_idx: tuple):
+        """Handles the walking sound for the player"""
+
+        # Get the tile the player is standing on
+        player_tile = self.map_array[player_idx[1] + 2][player_idx[0]]
+
+        # If the tile is not air, play the walking sound
+        if player_tile is not None:
+            play_sound(Tiles.tile_dict[str(player_tile.id)]["sound_name"])
 
     def end_level(self):
         Logger.log("The player has touched the end of the level, oh well")
