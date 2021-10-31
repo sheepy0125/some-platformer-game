@@ -6,15 +6,15 @@ A map must meet these requirements:
 
 Tile dictionary:
     0 = sky
-    1 = dirt
-    2 = (unused)
-    3 = (unused)
+    1 = grass
+    2 = dirt
+    3 = stone
     4 = (unused)
     5 = (unused)
     6 = (unused)
     7 = (unused)
-    8 = (unused)
-    9 = player tile
+    8 = end tile
+    9 = player spawn tile
 
 Unused tiles will appear as 
 `/src/assets/images/tiles/error.png`
