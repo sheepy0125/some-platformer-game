@@ -24,7 +24,7 @@ class Sounds:
     sound_dict = {
         "jump": {"filename": str(SOUND_PATH / "jump.wav"), "idx": 0},
         "grass_step": {"filename": str(SOUND_PATH / "grass_step.wav"), "idx": 1},
-        "stone_step": {"filename": str(SOUND_PATH / "dirt_step.wav"), "idx": 2},
+        "stone_step": {"filename": str(SOUND_PATH / "stone_step.wav"), "idx": 2},
         "damage": {"filename": str(SOUND_PATH / "damage.wav"), "idx": 3},
         "death": {"filename": str(SOUND_PATH / "death.wav"), "idx": 4},
     }

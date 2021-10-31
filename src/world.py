@@ -38,7 +38,7 @@ class Tiles:
         "3": {
             "filepath": str(TILE_IMAGE_FOLDER / "stone.png"),
             "name": "stone",
-            "sound_name": "grass_step",
+            "sound_name": "stone_step",
             "max_amount": -1,
         },
         "8": {

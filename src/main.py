@@ -45,6 +45,7 @@ while True:
 
     player.event_handler()
     player.move(world=world)
+
     # Handle sounds
     if player.collision_types["bottom"] and abs(player.vx) > 0.1:
         world.handle_walk_sound(

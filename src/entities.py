@@ -211,8 +211,3 @@ class Player(Entity):
         else:
             self.target_speed = 0
             return
-
-        # The player moved, handle sounds
-        if self.collision_types["bottom"]:
-            # TODO - Detect what is below the player
-            play_sound("grass_step")
