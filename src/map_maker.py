@@ -422,6 +422,7 @@ def create_tile(mouse_pos: tuple):
         ),
         image_path=tile_image_filepath,
         id=tile_id,
+        create_rect=False,  # We don't need to do collision, no rect needed
     )
     Tiles.total_tiles += 1
     Tiles.tile_dict[str(tile_id)]["amount"] += 1

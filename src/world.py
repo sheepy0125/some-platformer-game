@@ -150,19 +150,21 @@ class World:
 class Tile:
     """Base tile class"""
 
-    def __init__(self, pos: tuple, image_path: str, id: int):
+    def __init__(self, pos: tuple, image_path: str, id: int, create_rect: bool = True):
         self.x, self.y = pos
         self.image_path = image_path
         self.id = id
 
-        self.create()
+        self.create(create_rect)
 
     def __str__(self):
         return f"({self.x=},{self.y=}) {self.scroll_x=},{self.scroll_y=} {self.image_path=}"
 
-    def create(self):
+    def create(self, create_rect: bool = True):
         self.surface = pygame.image.load(self.image_path).convert_alpha()
         self.surface = pygame.transform.scale(self.surface, (TILE_SIZE, TILE_SIZE))
+        if not create_rect:
+            return
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
     def draw(self, optimize: bool = True):
@@ -181,7 +183,9 @@ class Tile:
                     )
             return
 
-        screen.blit(self.surface, self.rect)
+        screen.blit(
+            self.surface, (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y)
+        )
 
 
 #################
