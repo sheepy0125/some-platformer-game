@@ -171,10 +171,8 @@ class Player(Entity):
         super().move(world)
 
         # Check if collided with the ending tile
-        if world.end_tile is not None:
-            # Check collision
-            if self.rect.colliderect(world.end_tile.rect):
-                world.end_level()
+        if world.end_tile is not None and self.rect.colliderect(world.end_tile.rect):
+            world.end_level()
 
     def event_handler(self):
         keys: dict = pygame.key.get_pressed()
@@ -210,4 +208,3 @@ class Player(Entity):
 
         else:
             self.target_speed = 0
-            return

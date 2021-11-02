@@ -17,6 +17,7 @@ from pygame_utils import Text
 from utils import Logger, Scrolling, ROOT_PATH
 from os import system, remove
 from os.path import realpath
+from typing import Union
 
 SCREEN_SIZE = (800, 800)
 SIDEBAR_SIZE = (200, 800)
@@ -406,10 +407,9 @@ def create_tile(mouse_pos: tuple):
     # Don't allow creation of tile if the max number of tiles has been reached for that tile
     if (
         max_num_of_tiles := Tiles.tile_dict[str(Tiles.current_tile)]["max_amount"]
-    ) != -1:
-        if max_num_of_tiles <= Tiles.tile_dict[str(Tiles.current_tile)]["amount"]:
-            Logger.warn(f"Can't create more than {max_num_of_tiles} of this tile!")
-            return
+    ) != -1 and max_num_of_tiles <= Tiles.tile_dict[str(Tiles.current_tile)]["amount"]:
+        Logger.warn(f"Can't create more than {max_num_of_tiles} of this tile!")
+        return
 
     # Get tile filepath and ID
     tile_id = Tiles.current_tile
@@ -446,7 +446,6 @@ def resize_map():
 
     if not MapSize.resizable:
         raise ValueError("The map isn't resizable!")
-        return
 
     # TODO: Use Tkinter instead
     # FIXME: Update total tiles
@@ -460,16 +459,14 @@ def resize_map():
     # Make sure the new size is valid
     if new_size[0] < 12 or new_size[1] < 16:
         raise ValueError("The new size selected is too small!")
-        return
 
     elif new_size[0] < MapSize.size[0] or new_size[1] < MapSize.size[1]:
         Logger.warn("The new size selected is smaller than the current size!")
         if not confirm_dialog(
             "Resize map",
-            "Are you sure you want to resize the map? " "This will crop the map!",
+            "Are you sure you want to resize the map? This will crop the map!",
         ):
             raise ValueError("Resize aborted")
-            return
 
     TileMap.resize_map(new_size)
 
@@ -546,7 +543,7 @@ def export_map(filepath: str = None):
 ### Map setup ###
 #################
 def map_setup() -> tuple:
-    def save_variables() -> int:
+    def save_variables() -> Union[int, None]:
         try:
             assert (
                 width := width_spinbox.get()
