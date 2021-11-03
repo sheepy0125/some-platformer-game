@@ -4,7 +4,8 @@ Created by sheepy0125
 10/10/2021
 """
 
-from pygame_setup import pygame, screen, SCREEN_SIZE
+from pygame_setup import pygame, screen
+from typing import Union
 
 pygame.font.init()
 
@@ -17,7 +18,7 @@ class Text:
         text_to_display: str,
         pos: tuple,
         size: int,
-        color: str = "white",  # or tuple
+        color: Union[str, tuple] = "white",
     ):
         # Create text
         self.text_surf = pygame.font.SysFont("Arial", size).render(
@@ -32,12 +33,7 @@ class Text:
 class Button:
     """Display a button for Pygame"""
 
-    def __init__(
-        self,
-        pos: tuple,
-        size: tuple,
-        color: str = "white",  # or tuple
-    ):
+    def __init__(self, pos: tuple, size: tuple, color: Union[str, tuple] = "white"):
         self.button_pos = pos
         self.button_size = size
         self.button_color = color
@@ -76,12 +72,7 @@ class Button:
 class CenterRect:
     """A Pygame rectangle, but it is centered. Don't ask"""
 
-    def __init__(
-        self,
-        pos: tuple,
-        size: tuple,
-        color: str = "white",  # or tuple
-    ):
+    def __init__(self, pos: tuple, size: tuple, color: Union[str, tuple] = "white"):
         self.center_pos = pos
         self.size = size
         self.color = color
