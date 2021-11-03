@@ -69,7 +69,7 @@ class Button:
         self.button_rect.draw()
 
 
-class CenterRect:
+class CenterRect(pygame.Rect):
     """A Pygame rectangle, but it is centered. Don't ask"""
 
     def __init__(self, pos: tuple, size: tuple, color: Union[str, tuple] = "white"):
@@ -82,7 +82,7 @@ class CenterRect:
         self.top = self.center_pos[1] - (self.size[1] * 0.5)
 
         # Create rectangle
-        self.rect = pygame.Rect(self.left, self.top, *self.size)
+        super().__init__(self.left, self.top, *self.size)
 
     def draw(self):
-        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, self.color, self)

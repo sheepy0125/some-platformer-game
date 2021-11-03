@@ -9,7 +9,7 @@ Created by duuuuck and sheepy0125
 # Import
 from pygame_setup import pygame, screen, clock, SCROLL_OFFSET, SCREEN_SIZE
 from config_parser import FPS, MAP_PATH
-from entities import Player, Entity
+from entities import Player, BaseEntity
 from sounds import stop_sound
 from utils import Logger, Scrolling
 from world import World, load_map, get_tile_idx, snap_to_grid, TILE_SIZE
@@ -23,8 +23,10 @@ world = World(
 )
 
 # Create entities
-player = Player(world.player_pos)
-entities: list[Entity] = []
+player = Player(
+    world.player_pos,
+)
+entities: list[BaseEntity] = []
 
 
 # Setup scrolling
@@ -43,8 +45,7 @@ while True:
             pygame.quit()
             exit(0)
 
-    player.event_handler()
-    player.move(world=world)
+    player.update(world=world)
 
     # Handle sounds
     if player.collision_types["bottom"] and abs(player.vx) > 0.1:

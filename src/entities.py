@@ -5,33 +5,31 @@ Created by duuuuck and sheepy0125
 """
 
 from pygame_setup import pygame, screen
-from config_parser import FPS, GRAVITY
+from config_parser import GRAVITY
 from utils import Logger, Scrolling, ROOT_PATH
+from pygame_utils import CenterRect
 from world import World
 from sounds import play_sound
 from time import time
-from typing import Union
 from pathlib import Path
 
 
 ##############
 ### Entity ###
 ##############
-class Entity:
+class BaseEntity:
     """Base entity class"""
 
-    def __init__(self, size: tuple, image_path: Union[str, None], default_pos: tuple):
-        # If we don't have an image path, just use a blank image
-        if image_path is not None:
-            self.image_path = image_path
-        else:
-            self.image_path = str(ROOT_PATH / "assets" / "images" / "blank.png")
-
+    def __init__(self, size: tuple, spritesheet_data: dict, default_pos: tuple):
         self.size = size
         self.default_pos = list(default_pos)
 
+        self.spritesheet_data = spritesheet_data
+        self.spritesheet_update_deltatime = 0.1
+
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
+
         self.land_time = time()
         self.prev_on_ground = False
 
@@ -42,23 +40,45 @@ class Entity:
         return f"{self.size=} {self.image_path=} {self.movement_speed=}"
 
     def create(self):
-        self.surface = pygame.image.load(self.image_path).convert_alpha()
-        self.surface = pygame.transform.scale(self.surface, self.size)
-        self.fall_surf = pygame.transform.scale(
-            self.surface, (self.size[0] - 6, self.size[1] + 6)
-        )
-        self.land_surf = pygame.transform.scale(
-            self.surface, (self.size[0] + 10, self.size[1] - 10)
-        )
-        self.rect = self.surface.get_rect(center=self.default_pos)
+        """Create surfaces from spritesheet"""
 
-    def reset_collision_types(self):
-        self.collision_types = {
-            "top": False,
-            "bottom": False,
-            "left": False,
-            "right": False,
-        }
+        for spritesheet_name, spritesheet_info in self.spritesheet_data.items():
+            self.spritesheet_data[spritesheet_name]["spritesheet"] = SpriteSheet(
+                image_path=spritesheet_info["image_path"],
+                width_each=spritesheet_info["width_each"],
+                conversion_size=self.size,
+            )
+
+            # Add last update time
+            self.spritesheet_data[spritesheet_name]["last_update"] = time()
+
+        self.current_spritesheet = "idle"
+        self.rect = CenterRect(self.default_pos, self.size)
+
+    def update(self):
+        # If it's time for the spritesheet to be updated, do it
+        if (
+            time() - self.spritesheet_data[self.current_spritesheet]["last_update"]
+            > self.spritesheet_update_deltatime
+        ):
+            self.spritesheet_data[self.current_spritesheet]["last_update"] = time()
+            self.update_spritesheet()
+
+    def update_spritesheet(self):
+        # Update spritesheet frame
+        self.spritesheet_data[self.current_spritesheet][
+            "spritesheet"
+        ].current_frame += 1
+        # Assert the frame is in range
+        if (
+            self.spritesheet_data[self.current_spritesheet]["spritesheet"].current_frame
+            >= self.spritesheet_data[self.current_spritesheet][
+                "spritesheet"
+            ].total_frames
+        ):
+            self.spritesheet_data[self.current_spritesheet][
+                "spritesheet"
+            ].current_frame = 0
 
     def move(self, world: World):
         self.reset_collision_types()
@@ -120,10 +140,24 @@ class Entity:
 
         self.prev_on_ground = self.collision_types["bottom"]
 
+    def reset_collision_types(self):
+        self.collision_types = {
+            "top": False,
+            "bottom": False,
+            "left": False,
+            "right": False,
+        }
+
     def draw(self):
-        # Draw
+        surface_to_blit = self.spritesheet_data[self.current_spritesheet][
+            "spritesheet"
+        ].surfaces[
+            self.spritesheet_data[self.current_spritesheet]["spritesheet"].current_frame
+        ]
+
+        # Draw current frame of the spritesheet
         screen.blit(
-            self.surface,
+            surface_to_blit,
             (self.rect.x - Scrolling.scroll_x, self.rect.y - Scrolling.scroll_y),
         )
 
@@ -131,11 +165,28 @@ class Entity:
 ##############
 ### Player ###
 ##############
-class Player(Entity):
-    def __init__(self, pos):
+class Player(BaseEntity):
+    def __init__(self, pos: tuple):
+        # Create spritesheet data
+        PLAYER_SPRITESHEET_IMAGES_DIR = ROOT_PATH / "assets" / "images" / "player"
+        spritesheet_data = {
+            "idle": {
+                "image_path": str(PLAYER_SPRITESHEET_IMAGES_DIR / "idle.png"),
+                "width_each": 10,
+            },
+            "walk": {
+                "image_path": str(PLAYER_SPRITESHEET_IMAGES_DIR / "walk.png"),
+                "width_each": 10,
+            },
+            "jump": {
+                "image_path": str(PLAYER_SPRITESHEET_IMAGES_DIR / "jump.png"),
+                "width_each": 10,
+            },
+        }
+
         super().__init__(
             size=(30, 50),
-            image_path=None,
+            spritesheet_data=spritesheet_data,
             default_pos=pos,
         )
         self.target_speed = 0
@@ -144,12 +195,15 @@ class Player(Entity):
 
         Logger.log("Created player")
 
+    def update(self, world: World):
+        """Updates everything, extends from BaseEntity.update()"""
+        super().update()
+
+        self.move(world)
+        self.event_handler()
+
     def move(self, world: World):
         speed_dif = self.target_speed - self.vx
-
-        # What the heck does this do?
-        # What is target_speed?
-        # duuuuck!!!!
 
         if self.target_speed == 0:
             self.vx += speed_dif / 6
@@ -219,9 +273,10 @@ class SpriteSheet:
         self.width_each = width_each
         self.conversion_size = conversion_size
 
-        self.current_frame = 0
-
         self.surfaces = self.create_surfaces()
+
+        self.current_frame = 0
+        self.total_frames = len(self.surfaces)
 
     def create_surfaces(self) -> list:
         """Loads a spritesheet image and creates a list of surfaces from it"""
@@ -238,9 +293,8 @@ class SpriteSheet:
                 " is not an integer! This will result in clipped frames!"
             )
 
-            # Floor it anyway
-            Logger.warn("Flooring columns")
-            columns = int(columns)
+        # Floor it anyway
+        columns = int(columns)
 
         # Create surfaces
         surfaces = []
