@@ -4,12 +4,14 @@ Created by duuuuck and sheepy0125
 08/10/2021
 """
 
-from pygame_setup import pygame, screen, SCREEN_SIZE, SCROLL_OFFSET
+from pygame_setup import pygame, screen
 from config_parser import FPS, GRAVITY
 from utils import Logger, Scrolling, ROOT_PATH
 from world import World
 from sounds import play_sound
 from time import time
+from typing import Union
+from pathlib import Path
 
 
 ##############
@@ -18,23 +20,22 @@ from time import time
 class Entity:
     """Base entity class"""
 
-    def __init__(self, size: tuple, image_path: str, default_pos: tuple):
+    def __init__(self, size: tuple, image_path: Union[str, None], default_pos: tuple):
+        # If we don't have an image path, just use a blank image
+        if image_path is not None:
+            self.image_path = image_path
+        else:
+            self.image_path = str(ROOT_PATH / "assets" / "images" / "blank.png")
+
         self.size = size
-        self.image_path = image_path
         self.default_pos = list(default_pos)
+
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
-
         self.land_time = time()
-
-        self.collision_types = {
-            "top": False,
-            "bottom": False,
-            "left": False,
-            "right": False,
-        }
         self.prev_on_ground = False
 
+        self.reset_collision_types()
         self.create()
 
     def __str__(self):
@@ -51,8 +52,7 @@ class Entity:
         )
         self.rect = self.surface.get_rect(center=self.default_pos)
 
-    def move(self, world: World):
-        # Horizontal
+    def reset_collision_types(self):
         self.collision_types = {
             "top": False,
             "bottom": False,
@@ -60,13 +60,14 @@ class Entity:
             "right": False,
         }
 
+    def move(self, world: World):
+        self.reset_collision_types()
+
+        # Horizontal
+
         # Add velocity
         if abs(self.vx > self.velocity_cap[0]):
             self.vx = self.velocity_cap[0]
-
-        # Terminal velocity
-        # if abs(self.vy) < self.velocity_cap[1]:
-        # self.vy = self.velocity_cap[1]
 
         # Set position
         self.rect.x += round(self.vx)
@@ -120,27 +121,10 @@ class Entity:
         self.prev_on_ground = self.collision_types["bottom"]
 
     def draw(self):
-        # Squashing and stretching
-        surface = self.surface
-        draw_x = self.rect.x
-        draw_y = self.rect.y
-
-        # Stretching
-        if not self.collision_types["bottom"]:
-            surface = self.fall_surf
-            draw_x += 3
-            draw_y -= 3
-
-        # Squashing
-        elif time() - self.land_time < 0.1:
-            surface = self.land_surf
-            draw_x -= 5
-            draw_y += 10
-
         # Draw
         screen.blit(
-            surface,
-            (draw_x - Scrolling.scroll_x, draw_y - Scrolling.scroll_y),
+            self.surface,
+            (self.rect.x - Scrolling.scroll_x, self.rect.y - Scrolling.scroll_y),
         )
 
 
@@ -151,7 +135,7 @@ class Player(Entity):
     def __init__(self, pos):
         super().__init__(
             size=(30, 50),
-            image_path=str(ROOT_PATH / "assets" / "images" / "player.png"),
+            image_path=None,
             default_pos=pos,
         )
         self.target_speed = 0
@@ -162,6 +146,10 @@ class Player(Entity):
 
     def move(self, world: World):
         speed_dif = self.target_speed - self.vx
+
+        # What the heck does this do?
+        # What is target_speed?
+        # duuuuck!!!!
 
         if self.target_speed == 0:
             self.vx += speed_dif / 6
@@ -208,3 +196,65 @@ class Player(Entity):
 
         else:
             self.target_speed = 0
+
+
+####################
+### Sprite sheet ###
+####################
+class SpriteSheet:
+    """
+    Handles sprite sheet loading
+    Currently we assume the spritesheet only had one row and that the width
+    of each frame in the spritesheet is static, with no margins or padding
+    """
+
+    def __init__(self, image_path: Path, width_each: int, conversion_size: tuple):
+        """
+        :param image_path:       The path to the sprite sheet
+        :param width_each:       The width of each frame of the spritesheet
+        :param conversion_size:  The size each frame will be rendered as
+        """
+
+        self.image_path = image_path
+        self.width_each = width_each
+        self.conversion_size = conversion_size
+
+        self.current_frame = 0
+
+        self.surfaces = self.create_surfaces()
+
+    def create_surfaces(self) -> list:
+        """Loads a spritesheet image and creates a list of surfaces from it"""
+
+        main_image = pygame.image.load(self.image_path).convert_alpha()
+        main_image_height = main_image.get_height()
+        main_image_width = main_image.get_width()
+        columns = main_image_width / self.width_each
+
+        # Assert the number of columns is an integer
+        if columns != int(columns):
+            Logger.warn(
+                f"The number of columns/frames in the spritesheet ({columns})"
+                " is not an integer! This will result in clipped frames!"
+            )
+
+            # Floor it anyway
+            Logger.warn("Flooring columns")
+            columns = int(columns)
+
+        # Create surfaces
+        surfaces = []
+        for column in range(columns):
+            surfaces.append(
+                pygame.transform.scale(
+                    main_image.subsurface(
+                        pygame.Rect(
+                            (column * self.width_each, 0),
+                            (self.width_each, main_image_height),
+                        )
+                    ),
+                    self.conversion_size,
+                )
+            )
+
+        return surfaces
