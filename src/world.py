@@ -168,19 +168,14 @@ class Tile:
         self.rect = self.surface.get_rect(left=self.x, top=self.y)
 
     def draw(self, optimize: bool = True):
-        if optimize:
-            if (
-                self.x - Scrolling.scroll_x < SCREEN_SIZE[0]
-                and self.x + TILE_SIZE - Scrolling.scroll_x > 0
-            ):
-                if (
-                    self.y - Scrolling.scroll_y < SCREEN_SIZE[1]
-                    and self.y + TILE_SIZE - Scrolling.scroll_y > 0
-                ):
-                    screen.blit(
-                        self.surface,
-                        (self.x - Scrolling.scroll_x, self.y - Scrolling.scroll_y),
-                    )
+        if optimize and not (
+            (left_side := (self.rect.left - Scrolling.scroll_x) < SCREEN_SIZE[0])
+            and (right_side := (self.rect.right + Scrolling.scroll_x) > 0)
+            and (bottom_side := (self.rect.top - Scrolling.scroll_y) < SCREEN_SIZE[1])
+            and (top_side := (self.rect.bottom + Scrolling.scroll_y) > 0)
+        ):
+            # TODO: Logger.debug()
+            #       That's what the walruses are for!
             return
 
         screen.blit(
