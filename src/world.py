@@ -124,7 +124,7 @@ class World:
 
         try:
             # Get the tile the player is standing on
-            player_tile = self.map_array[player_idx[1] + 2][player_idx[0]]
+            player_tile = self.map_array[player_idx[1] + 1][player_idx[0]]
 
         except IndexError:
             return
