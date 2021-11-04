@@ -66,19 +66,12 @@ class BaseEntity:
 
     def update_spritesheet(self):
         # Update spritesheet frame
-        self.spritesheet_data[self.current_spritesheet][
-            "spritesheet"
-        ].current_frame += 1
+        self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame += 1
         # Assert the frame is in range
-        if (
-            self.spritesheet_data[self.current_spritesheet]["spritesheet"].current_frame
-            >= self.spritesheet_data[self.current_spritesheet][
-                "spritesheet"
-            ].total_frames
+        if (self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame) >= (
+            self.spritesheet_data[self.current_spritesheet]["spritesheet"].total_frames
         ):
-            self.spritesheet_data[self.current_spritesheet][
-                "spritesheet"
-            ].current_frame = 0
+            self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame = 0
 
     def move(self, world: World):
         self.reset_collision_types()
@@ -149,11 +142,9 @@ class BaseEntity:
         }
 
     def draw(self):
-        surface_to_blit = self.spritesheet_data[self.current_spritesheet][
-            "spritesheet"
-        ].surfaces[
-            self.spritesheet_data[self.current_spritesheet]["spritesheet"].current_frame
-        ]
+        surface_to_blit = (
+            self.spritesheet_data[self.current_spritesheet]["spritesheet"]
+        ).surfaces[self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame]
 
         # Draw current frame of the spritesheet
         screen.blit(
@@ -275,7 +266,7 @@ class SpriteSheet:
 
         self.surfaces = self.create_surfaces()
 
-        self.current_frame = 0
+        self.frame = 0
         self.total_frames = len(self.surfaces)
 
     def create_surfaces(self) -> list:
