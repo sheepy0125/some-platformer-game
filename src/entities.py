@@ -236,7 +236,7 @@ class Player(BaseEntity):
             self.collision_types["bottom"]
             or time() - self.air_time < self.air_time_grace_period
         ):
-            play_sound("jump")
+            play_sound("jump", volume=0.25)
             self.vy = -20
 
         # Right

@@ -38,7 +38,7 @@ channels = [pygame.mixer.Channel(i) for i in range(len(Sounds.sound_dict))]
 ##################
 ### Play sound ###
 ##################
-def play_sound(sound_name: str):
+def play_sound(sound_name: str, volume: float = 1.0):
     """
     Plays a sound with error handling
     Has timeouts as well
@@ -54,6 +54,7 @@ def play_sound(sound_name: str):
             raise RuntimeError
 
         # Play sound
+        channels[sound_idx].set_volume(volume)
         channels[sound_idx].play(sound)
     except KeyError:
         Logger.fatal(f"Sound {sound_name} not found, cannot play")
