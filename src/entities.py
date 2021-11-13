@@ -28,6 +28,7 @@ class BaseEntity:
 
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
+        self.direction = "forward"  # "forward" or "backward"
 
         self.land_time = time()
         self.prev_on_ground = False
@@ -146,7 +147,9 @@ class BaseEntity:
     def draw(self):
         surface_to_blit = (
             self.spritesheet_data[self.current_spritesheet]["spritesheet"]
-        ).surfaces[self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame]
+        ).surfaces[self.direction][
+            self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame
+        ]
 
         # Draw current frame of the spritesheet
         screen.blit(
@@ -239,10 +242,12 @@ class Player(BaseEntity):
         # Right
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.target_speed = 10
+            self.direction = "forward"
 
         # Left
         elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.target_speed = -10
+            self.direction = "backward"
 
         else:
             self.target_speed = 0
@@ -278,7 +283,7 @@ class SpriteSheet:
         self.frame = 0
         self.total_frames = len(self.surfaces)
 
-    def create_surfaces(self) -> list:
+    def create_surfaces(self) -> dict:
         """Loads a spritesheet image and creates a list of surfaces from it"""
 
         main_image = pygame.image.load(self.image_path).convert_alpha()
@@ -297,18 +302,22 @@ class SpriteSheet:
         columns = int(columns)
 
         # Create surfaces
-        surfaces = []
+        surfaces = {"forward": [], "backward": []}
         for column in range(columns):
-            surfaces.append(
-                pygame.transform.scale(
-                    main_image.subsurface(
-                        pygame.Rect(
-                            (column * self.width_each, 0),
-                            (self.width_each, main_image_height),
-                        )
-                    ),
-                    self.conversion_size,
-                )
+            surface: pygame.Surface = pygame.transform.scale(
+                main_image.subsurface(
+                    pygame.Rect(
+                        (column * self.width_each, 0),
+                        (self.width_each, main_image_height),
+                    )
+                ),
+                self.conversion_size,
             )
+
+            # Right now, each frame is assumed to be facing backwards
+            surfaces["forward"].append(
+                pygame.transform.flip(surface, flip_x=True, flip_y=False)
+            )
+            surfaces["backward"].append(surface)
 
         return surfaces
