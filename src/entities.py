@@ -25,7 +25,6 @@ class BaseEntity:
         self.default_pos = list(default_pos)
 
         self.spritesheet_data = spritesheet_data
-        self.spritesheet_update_deltatime = 0.1
 
         self.velocity_cap = (20, 10)
         self.vx = self.vy = 0
@@ -59,7 +58,7 @@ class BaseEntity:
         # If it's time for the spritesheet to be updated, do it
         if (
             time() - self.spritesheet_data[self.current_spritesheet]["last_update"]
-            > self.spritesheet_update_deltatime
+            > self.spritesheet_data[self.current_spritesheet]["update_deltatime"]
         ):
             self.spritesheet_data[self.current_spritesheet]["last_update"] = time()
             self.update_spritesheet()
@@ -103,6 +102,9 @@ class BaseEntity:
 
             # Collided, reset the velocity
             self.vx = 0
+
+            # Reset spritesheet
+            self.current_spritesheet = "idle"
 
         # Vertical
 
@@ -164,14 +166,17 @@ class Player(BaseEntity):
             "idle": {
                 "image_path": str(PLAYER_SPRITESHEET_IMAGES_DIR / "idle.png"),
                 "width_each": 10,
+                "update_deltatime": 0.1,
             },
             "walk": {
                 "image_path": str(PLAYER_SPRITESHEET_IMAGES_DIR / "walk.png"),
                 "width_each": 10,
+                "update_deltatime": 0.05,
             },
             "jump": {
                 "image_path": str(PLAYER_SPRITESHEET_IMAGES_DIR / "jump.png"),
                 "width_each": 10,
+                "update_deltatime": 0.1,
             },
         }
 
@@ -241,6 +246,10 @@ class Player(BaseEntity):
 
         else:
             self.target_speed = 0
+            self.current_spritesheet = "idle"
+            return
+
+        self.current_spritesheet = "walk"
 
 
 ####################
