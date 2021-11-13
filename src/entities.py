@@ -67,6 +67,7 @@ class BaseEntity:
     def update_spritesheet(self):
         # Update spritesheet frame
         self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame += 1
+
         # Assert the frame is in range
         if (self.spritesheet_data[self.current_spritesheet]["spritesheet"].frame) >= (
             self.spritesheet_data[self.current_spritesheet]["spritesheet"].total_frames
@@ -251,6 +252,12 @@ class Player(BaseEntity):
 
         else:
             self.target_speed = 0
+            self.current_spritesheet = "idle"
+            return
+
+        # The player is moving, so set the spritesheet to walk
+        # But, if the player is colliding with something, set the spritesheet to idle
+        if self.collision_types["left"] or self.collision_types["right"]:
             self.current_spritesheet = "idle"
             return
 
