@@ -88,3 +88,58 @@ class Scrolling:
             Scrolling.scroll_y = 0
         elif Scrolling.scroll_y >= Scrolling.max_scroll_y:
             Scrolling.scroll_y = Scrolling.max_scroll_y
+
+class Animations:
+
+    def __init__(self,image_path,cols,rows,dict_names):
+        self.sprites = self.get_images_from_spritesheet(image_path,cols,rows)
+        self.dict = self.load_dict(dict_names)
+    def load_dict(self,dict_names):
+        for i in range(len(sprites)):
+            self.dict[dict_names[i]] = sprites[i]
+
+    def add_extra_sprites(self):
+        for i in self.dict:
+            copied_sprites = self.dict[i].copy()
+            squashed_sprites = []
+            stretched_sprites = []
+            for i in copied_sprites:
+                squashed_sprite = pygame.transform.scale()
+                squashed_sprites.append()
+                stretched_sprites.append()
+
+
+
+    def get_images_from_spritesheet(image_path, cols, rows):
+        """ 
+            get the images from the spritesheet
+            cols is number of columns
+            rows is number of rows
+        """
+        spritesheet = pygame.image.load(image_path)
+        sprite_width = spritesheet.get_width() / cols
+        sprite_height = spritesheet.get_height() / rows
+
+        empty_image = pygame.Surface((sprite_width,sprite_height)).get_buffer().raw
+
+        rows = []
+
+        # loop through the number of columns
+        for col_num in range(cols):
+            # get the x position of the sprite by multiplying 
+            # the column that its on by the width
+            
+            x_pos = col_num * sprite_width
+            row_images = []
+            for row_num in range(rows):
+                # loop through the number of rows
+                y_pos = row_num * sprite_height
+                sprite_rect = (x_pos, y_pos, sprite_width, sprite_height)
+                sprite = spritesheet.subsurface(sprite_rect)
+                if sprite.get_buffer().raw == empty_image:
+                    continue
+                row_images.append(sprite)
+
+            rows.append(row_images)
+
+        return rows
